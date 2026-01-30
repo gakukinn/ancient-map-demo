@@ -1,0 +1,897 @@
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { GameMap } from './map/GameMap';
+import { CityManager } from './core/CityManager';
+import { GridManager } from './core/GridManager';
+import { FactionManager } from './core/FactionManager';
+import { Player } from './core/Player';
+import { LegionRenderer } from './map/LegionRenderer';
+import { initializeGlobalUnitRenderer } from './map/UnitRenderer';
+import { SpeedOverlayRenderer } from './map/SpeedOverlayRenderer';
+import { MapColorSampler } from './map/MapColorSampler';
+import { TerrainSpeedSystem, TerrainSpeed, TERRAIN_SPEED_CONFIG } from './core/TerrainSpeedSystem';
+import { ColorDebugger } from './map/ColorDebugger';
+import { TerrainOverrideManager } from './core/TerrainOverrideManager';
+import { TimeSystem } from './core/TimeSystem';
+import { HistoricalEventManager } from './core/HistoricalEventManager';
+import { GridSystem } from './systems/GridSystem';
+import { ModalManager } from './ui/ModalManager';
+import { NPCManager } from './core/NPCManager';
+import { CombatSystem } from './core/CombatSystem';
+import { EventEditor } from './core/EventEditor';
+import { CityEditor } from './core/CityEditor';
+
+declare global {
+    interface Window {
+        game: any;
+        gameMap: GameMap;
+        player: Player;
+        speedOverlay: SpeedOverlayRenderer;
+        timeSystem: TimeSystem;
+        npcManager: NPCManager;
+        combatSystem: CombatSystem;
+        eventEditor: EventEditor;
+    }
+}
+
+// Game configuration constants
+const GAME_CONSTANTS = {
+    NPC_STOP_DISTANCE: 0.2,          // Distance to stop before NPC (degrees, ~20km)
+    CITY_NEARBY_THRESHOLD: 7,        // City proximity threshold (hex grids)
+    TROOP_REPLENISH_RATE: 0.1,       // Troop recovery rate per season (10%)
+    UI_UPDATE_INTERVAL: 100,         // UI refresh interval (milliseconds)
+    NPC_SPAWN_DELAY: 3000,           // Delay before spawning NPCs (milliseconds)
+    TOTAL_NPC_COUNT: 90              // Total number of NPCs to spawn
+} as const;
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Game starting...');
+    const map = new GameMap('map');
+    const factionManager = new FactionManager();
+    const cityManager = new CityManager(map, factionManager);
+    const gridManager = new GridManager(map);
+
+    // Initialize global unit renderer for NPCs and armies
+    initializeGlobalUnitRenderer(map);
+
+    const factions = [
+        { id: 'huaxia', name: '华夏', color: '#1A1A1A' },     // 黑色 - 秦朝尚黑
+        { id: 'zhonghua', name: '中华', color: '#CC2222' },   // 红色 - 汉朝尚赤
+        { id: 'tianchao', name: '天朝', color: '#2266CC' },   // 蓝色 - 江南水乡
+        { id: 'chaoxian', name: '朝鲜', color: '#A0A0A0' },   // 银灰色 - 高丽
+        { id: 'menggu', name: '蒙古', color: '#556B2F' },     // 草原绿 - 蒙古草原
+        { id: 'qiangzang', name: '羌藏', color: '#CC6600' },  // 橙色 - 藏传佛教
+        { id: 'huihui', name: '回回', color: '#F5DEB3' },     // 米色 - 回回
+        { id: 'manzhou', name: '满洲', color: '#FFD700' },    // 金黄色 - 满清皇朝
+        { id: 'yuenan', name: '越南', color: '#20B2AA' },     // 青绿色 - 热带
+        { id: 'dianmian', name: '滇缅', color: '#8B4513' },   // 深棕色 - 滇缅
+        { id: 'riben', name: '日本', color: '#FFB7C5' },      // 樱花粉 - 日本
+        { id: 'xiyu', name: '西域', color: '#8B7355' },       // 沙漠棕 - 丝绸之路
+        { id: 'xiyang', name: '西洋', color: '#8B0000' },     // 深红色 - 罗马
+        { id: 'panjun', name: '叛军', color: '#505050' }      // 深灰色 - 叛乱
+    ];
+    factions.forEach(f => factionManager.addFaction(f));
+
+    const cities = [
+        // Capitals (都城)
+        { id: 'changan', name: '长安', factionId: 'huaxia', lat: 34.26, lng: 108.94 },
+        { id: 'luoyang', name: '洛阳', factionId: 'huaxia', lat: 34.62, lng: 112.45 },
+        { id: 'youzhou', name: '幽州', factionId: 'chaoxian', lat: 39.90, lng: 116.40 }, // Beijing
+        { id: 'nanjing', name: '南京', factionId: 'panjun', lat: 32.060000, lng: 118.790000 },
+
+        // Imperial Cities (皇城)
+        { id: 'kaifeng', name: '开封', factionId: 'menggu', lat: 34.79, lng: 114.30 },
+        { id: 'xinzheng', name: '新郑', factionId: 'qiangzang', lat: 34.39, lng: 113.73 },
+        { id: 'handan', name: '邯郸', factionId: 'huihui', lat: 36.62, lng: 114.53 },
+        { id: 'hangzhou', name: '杭州', factionId: 'tianchao', lat: 30.27, lng: 120.15 },
+        { id: 'chengdu', name: '成都', factionId: 'huaxia', lat: 30.57, lng: 104.06 },
+        { id: 'datong', name: '大同', factionId: 'huihui', lat: 40.070000, lng: 113.300000 },
+        { id: 'city_广州_476', name: '广州', factionId: 'yuenan', lat: 23.1301964, lng: 113.2592945 },
+
+        // Existing cities with assigned types
+        { id: 'qingzhou', name: '青州', factionId: 'zhonghua', lat: 36.69, lng: 118.46 }, // Large
+        { id: 'shouchun', name: '寿春', factionId: 'tianchao', lat: 32.58, lng: 116.78 }, // Large
+
+        // Water Towns / Special
+        { id: 'city_苏州_0', name: '苏州', factionId: 'tianchao', lat: 31.311123, lng: 120.6212881 },
+        { id: 'city_福州_29', name: '福州', factionId: 'yuenan', lat: 26.0774954, lng: 119.2918215 },
+        { id: 'city_桂林_160', name: '桂林', factionId: 'yuenan', lat: 25.2779894, lng: 110.2910622 },
+
+        // Border / Regional
+        { id: 'city_辽阳_134', name: '辽阳', factionId: 'chaoxian', lat: 41.2742898, lng: 123.1695757 }, // Korean
+        { id: 'city_巴彦淖尔市_845', name: '巴彦淖尔', factionId: 'huihui', lat: 41.569576, lng: 107.494851 }, // West/Northwest
+
+        // Others
+        { id: 'city_徐州_974', name: '徐州', factionId: 'huaxia', lat: 34.2663951, lng: 117.2017621 },
+        { id: 'city_汉中_864', name: '汉中', factionId: 'huaxia', lat: 33.171124, lng: 107.045009 }, // Pass
+        { id: 'city_正定_705', name: '正定', factionId: 'huihui', lat: 38.1621065, lng: 114.5510825 },
+        { id: 'city_changzhi', name: '长治', factionId: 'huihui', lat: 36.1830167, lng: 113.0992929 },
+        { id: 'changsha', name: '长沙', factionId: 'panjun', lat: 28.1450774, lng: 113.2384362 }
+    ];
+
+    const cityData = cities.map(c => {
+        let type: import('./types/core').CityType = 'large_city';
+        let image = 'cities/large_city.png';
+
+        // 1. Capital (都城) - 30k
+        if (['changan', 'luoyang', 'youzhou', 'nanjing'].includes(c.id)) {
+            type = 'capital';
+            image = 'cities/capital.png';
+        }
+        // 2. Imperial City (皇城) - 20k
+        else if (['kaifeng', 'xinzheng', 'handan', 'hangzhou', 'chengdu', 'datong', 'city_广州_476'].includes(c.id)) {
+            type = 'imperial_city';
+            image = 'cities/changan.png';
+        }
+        // 3. Huge City (大城) - 10k
+        else if (['shouchun', 'qingzhou', 'city_徐州_974'].includes(c.id)) {
+            type = 'huge_city';
+            image = 'cities/large_city.png';
+        }
+        // 4. Korean City (朝城)
+        else if (['city_辽阳_134'].includes(c.id)) {
+            type = 'korean_city';
+            image = 'cities/city_liaoyang.png'; // Reusing Liaoyang icon
+        }
+        // 5. West City (西城/西北)
+        else if (['city_巴彦淖尔市_845'].includes(c.id)) {
+            type = 'west_city';
+            image = 'cities/city_northwest.png';
+        }
+        // 6. South/Water (水乡/南城)
+        else if (['city_苏州_0'].includes(c.id)) {
+            type = 'south_city'; // Using generic South or reuse water logic
+            image = 'cities/city_suzhou.png';
+        }
+        else if (['city_福州_29', 'city_桂林_160'].includes(c.id)) {
+            type = 'south_city';
+            image = 'cities/city_suzhou.png';
+        }
+        // 7. Pass (关隘)
+        else if (['city_汉中_864'].includes(c.id)) {
+            type = 'pass';
+            image = 'cities/large_city.png'; // Todo: Pass icon
+        }
+        else {
+            // Default remaining to large or medium/small based on previous logic?
+            // Existing Zhengding, Changzhi were 'large_city'. Keeping them as 'large_city' (6k) or 'medium_city'?
+            // Let's default to 'large_city' (6k) as they were previously standard.
+            type = 'large_city';
+            image = 'cities/large_city.png';
+        }
+
+        // Import config for checking properties if needed, but for now just assign type.
+        // We will load stats in CityManager based on this type.
+        // Initial troops are overridden in CityManager or here? 
+        // User said: "All initial 1000".
+
+        return {
+            id: c.id,
+            name: c.name,
+            factionId: c.factionId,
+            latitude: c.lat,
+            longitude: c.lng,
+            type: type,
+            troops: 1000, // Fixed initial troops
+            image: image
+        };
+    });
+
+
+    const player = new Player();
+    // const playerRenderer = new PlayerRenderer(map, player);
+    const legionRenderer = new LegionRenderer(map, player);
+
+    const modalManager = new ModalManager();
+    const combatSystem = new CombatSystem();
+    const eventEditor = new EventEditor(cityManager);
+
+    // Initialize City Editor with CityManager
+    const cityEditor = new CityEditor(map.getLeafletMap(), cityManager, (cityData) => {
+        cityManager.addCity(cityData);
+    });
+
+    map.getLeafletMap().on('click', (e: L.LeafletMouseEvent) => {
+        if (speedOverlay.isEditing) return;
+        const { lat, lng } = e.latlng;
+        player.moveTo(lat, lng);
+    });
+
+    cityManager.setOnCityClick((city: any) => {
+        // Delegate to editor for selection if in edit mode
+        cityEditor.selectCityForEdit(city);
+
+        const currentTime = new Date().toISOString();
+        const gameDate = timeSystem.getFormattedDate();
+        console.log('🏙️ [CITY CLICK] ===================================');
+        console.log(`  时间戳: ${currentTime}`);
+        console.log(`  游戏时间: ${gameDate}`);
+        console.log(`  城市: ${city.name}`);
+        console.log(`  势力: ${city.factionId}`);
+        console.log('================================================');
+
+        const faction = factionManager.getFaction(city.factionId);
+        if (!faction) {
+            console.error('❌ [CITY CLICK] Faction not found:', city.factionId);
+            return;
+        }
+
+        const currentFactionId = player.getFaction();
+        console.log(`👤 [PLAYER] 当前势力: ${currentFactionId || '无'}`);
+
+        // If player is already in a faction
+        if (currentFactionId) {
+            // If clicking on a city of the SAME faction
+            if (currentFactionId === city.factionId) {
+                console.log('✅ [CITY CLICK] 同势力城市，移动到城市');
+                // Instead of showing alert, just move to the city
+                player.moveTo(city.latitude, city.longitude);
+                return;
+            }
+
+            // If clicking on a DIFFERENT faction city
+            console.log('⚠️ [CITY CLICK] 不同势力城市，显示改换门庭弹窗');
+            const currentFaction = factionManager.getFaction(currentFactionId);
+            const modalTime = new Date().toISOString();
+            console.log(`📋 [MODAL] 调用 showConfirm (改换门庭) at ${modalTime}`);
+
+            modalManager.showConfirm(
+                '改换门庭',
+                `你当前效力于 ${currentFaction?.name || '未知势力'}。\n确定要转投 ${faction.name} 吗？\n\n⚠️ 警告：\n1. 现有功勋将清零\n2. 官职将重置为【新兵】\n3. 兵力将重置为 10`,
+                () => {
+                    console.log('✅ [MODAL] 用户确认改换门庭');
+                    player.joinFaction(city.factionId);
+                    updateUI();
+                    modalManager.showAlert('加入成功', `你已加入 ${faction.name}！\n当前身份：新兵\n请努力积攒功勋，提升官职。`);
+                }
+            );
+            console.log('📋 [MODAL] showConfirm 调用完成');
+        } else {
+            // If player has NO faction, show join dialog
+            console.log('🆕 [CITY CLICK] 玩家无势力，显示加入势力弹窗');
+            const modalTime = new Date().toISOString();
+            console.log(`📋 [MODAL] 调用 showConfirm (加入势力) at ${modalTime}`);
+
+            modalManager.showConfirm(
+                '加入势力',
+                `是否加入 ${faction.name}？\n\n城市: ${city.name}\n\n加入后将获得身份【新兵】和 10 兵力。`,
+                () => {
+                    console.log('✅ [MODAL] 用户确认加入势力');
+                    player.joinFaction(city.factionId);
+                    updateUI();
+                    modalManager.showAlert('加入成功', `你已加入 ${faction.name}！\n当前身份：新兵\n请努力积攒功勋，提升官职。`);
+                }
+            );
+            console.log('📋 [MODAL] showConfirm 调用完成');
+        }
+    });
+
+    cityManager.addCities(cityData);
+
+    const colorSampler = new MapColorSampler(map);
+    const overrideManager = new TerrainOverrideManager();
+    TerrainSpeedSystem.initialize(colorSampler, overrideManager);
+
+    const speedOverlay = new SpeedOverlayRenderer(map, overrideManager, colorSampler);
+    const colorDebugger = new ColorDebugger(map, colorSampler);
+
+    const timeSystem = new TimeSystem();
+
+    const npcManager = new NPCManager(map, cityManager, player);
+
+    npcManager.setOnNPCClick((npc) => {
+        // Calculate direction vector to stop near NPC instead of overlapping
+        const playerPos = player.getPosition();
+        const dx = npc.longitude - playerPos.longitude;
+        const dy = npc.latitude - playerPos.latitude;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Target distance (0.2 degrees approx 20km)
+        const stopDistance = GAME_CONSTANTS.NPC_STOP_DISTANCE;
+
+        let targetLat = npc.latitude;
+        let targetLng = npc.longitude;
+
+        if (distance > stopDistance) {
+            const ratio = (distance - stopDistance) / distance;
+            targetLat = playerPos.latitude + dy * ratio;
+            targetLng = playerPos.longitude + dx * ratio;
+        }
+
+        // Move to target position and start battle
+        player.moveTo(targetLat, targetLng, () => {
+            combatSystem.startBattle(player, npc);
+        });
+    });
+
+    const historicalEventManager = new HistoricalEventManager(timeSystem, cityManager, map, combatSystem, player);
+
+    // Wire up player combat state to renderer
+    player.onCombatStateChangeCallback = (isFighting: boolean, battleType?: 'siege' | 'field') => {
+        if (isFighting) {
+            legionRenderer.triggerAttack(battleType);
+        } else {
+            legionRenderer.stopAttack();
+        }
+    };
+
+    player.onShowDamageCallback = (damage: number) => {
+        const pos = player.getPosition();
+        const icon = L.divIcon({
+            className: 'damage-text',
+            html: `<div style="
+                color: #ff0000;
+                font-weight: bold;
+                font-size: 16px;
+                text-shadow: 1px 1px 2px black;
+                animation: floatUp 1s ease-out forwards;
+            ">-${Math.floor(damage)}</div>`,
+            iconSize: [50, 20],
+            iconAnchor: [25, 10]
+        });
+
+        const marker = L.marker([pos.latitude, pos.longitude], {
+            icon: icon,
+            zIndexOffset: 2000
+        }).addTo(map.getLeafletMap());
+
+        setTimeout(() => {
+            marker.remove();
+        }, 1000);
+    };
+
+    player.onFactionChangeCallback = () => {
+        console.log('🔄 Player faction changed, reloading sprites...');
+        legionRenderer.reloadSprites();
+    };
+
+    setTimeout(() => {
+        npcManager.spawnNPCs(GAME_CONSTANTS.TOTAL_NPC_COUNT);
+    }, GAME_CONSTANTS.NPC_SPAWN_DELAY);
+
+    timeSystem.onYearChange(() => {
+        const gameDate = timeSystem.getFormattedDate();
+        console.log(`📅 [YEAR CHANGE] 年份变更: ${gameDate}`);
+        cityManager.updateTroops();
+        npcManager.respawnOneNPC(); // Respawn one NPC per year
+    });
+
+    timeSystem.onSeasonChange(() => {
+        const currentFactionId = player.getFaction();
+        if (!currentFactionId) {
+            console.log('⏭️ [SEASON] 玩家无势力，跳过兵力恢复');
+            return;
+        }
+
+        const playerPos = player.getPosition();
+        const playerHex = GridSystem.latLngToAxial(playerPos.latitude, playerPos.longitude, 34.26);
+
+        // Check if near any friendly city
+        const cities = cityManager.getCitiesByFaction(currentFactionId);
+        let isNearCity = false;
+        let nearestDistance = Infinity;
+        let nearestCityName = '';
+
+        for (const city of cities) {
+            const cityHex = GridSystem.latLngToAxial(city.latitude, city.longitude, 34.26);
+            const dist = (Math.abs(playerHex.q - cityHex.q) +
+                Math.abs(playerHex.q + playerHex.r - cityHex.q - cityHex.r) +
+                Math.abs(playerHex.r - cityHex.r)) / 2;
+
+            if (dist < nearestDistance) {
+                nearestDistance = dist;
+                nearestCityName = city.name;
+            }
+
+            if (dist <= GAME_CONSTANTS.CITY_NEARBY_THRESHOLD) {
+                isNearCity = true;
+                break;
+            }
+        }
+
+        console.log(`🌾 [SEASON] 季节变更 - 玩家势力: ${currentFactionId}, 最近城市: ${nearestCityName} (距离: ${nearestDistance.toFixed(1)} 格)`);
+
+        if (isNearCity) {
+            const maxTroops = player.getMaxTroops();
+            const currentTroops = player.getTroops();
+            if (currentTroops < maxTroops) {
+                const replenishAmount = Math.floor(maxTroops * GAME_CONSTANTS.TROOP_REPLENISH_RATE);
+                player.recruitTroops(replenishAmount);
+                console.log(`✅ [REPLENISH] 在城市附近恢复兵力: +${replenishAmount} (${currentTroops} -> ${player.getTroops()})`);
+
+                // Visual feedback (optional, maybe a toast or floating text later)
+                // For now, update UI immediately
+                updateUI();
+            } else {
+                console.log(`⏭️ [REPLENISH] 兵力已满，跳过恢复 (${currentTroops}/${maxTroops})`);
+            }
+        } else {
+            console.log(`❌ [REPLENISH] 不在城市附近，无法恢复兵力 (最近距离: ${nearestDistance.toFixed(1)} > ${GAME_CONSTANTS.CITY_NEARBY_THRESHOLD})`);
+        }
+    });
+
+    // Cache UI elements for performance
+    const uiElements = {
+        rank: document.getElementById('player-rank'),
+        troops: document.getElementById('player-troops'),
+        merit: document.getElementById('player-merit'),
+        faction: document.getElementById('player-faction'),
+        resignBtn: document.getElementById('resign-btn'),
+        date: document.getElementById('game-date'),
+        coords: document.getElementById('coords'),
+        hexCoords: document.getElementById('hex-coords'),
+        terrainType: document.getElementById('terrain-type'),
+        speedValue: document.querySelector('#player-speed .value') as HTMLElement,
+        pauseBtn: document.getElementById('pause-btn'),
+        speed1xBtn: document.getElementById('speed-1x'),
+        speed5xBtn: document.getElementById('speed-5x'),
+        speed10xBtn: document.getElementById('speed-10x'),
+        speed100xBtn: document.getElementById('speed-100x')
+    };
+
+    function updateUI() {
+        // Update Player Info
+        const info = player.getInfo();
+
+        if (uiElements.rank) uiElements.rank.textContent = info.rank;
+
+        // Only update troops if NOT fighting, or if force update is needed
+        // But here we just check isFighting. 
+        // If fighting, we show "战斗中..." or keep last value? 
+        // User asked to "refresh after battle". So we just don't update the text during battle.
+        if (!info.isFighting) {
+            if (uiElements.troops) uiElements.troops.textContent = `${Math.floor(info.troops)} / ${info.maxTroops}`;
+        } else {
+            if (uiElements.troops) uiElements.troops.textContent = `⚔️ ${Math.floor(info.troops)}`;
+        }
+
+        if (uiElements.merit) uiElements.merit.textContent = `${Math.floor(info.merit)}`;
+
+        if (uiElements.faction) {
+            const faction = info.faction ? factionManager.getFaction(info.faction) : null;
+            uiElements.faction.textContent = faction ? faction.name : '未选择';
+        }
+
+        if (uiElements.resignBtn) {
+            uiElements.resignBtn.style.display = (info.faction && info.faction !== '未选择') ? 'block' : 'none';
+        }
+
+        // Update Date
+        if (uiElements.date) {
+            uiElements.date.textContent = timeSystem.getFormattedDate();
+        }
+
+        // Update Coordinates and Terrain
+        if (uiElements.coords && uiElements.hexCoords && uiElements.terrainType) {
+            const pos = player.getPosition();
+            uiElements.coords.textContent = `${pos.latitude.toFixed(4)}, ${pos.longitude.toFixed(4)}`;
+
+            const hex = GridSystem.latLngToAxial(pos.latitude, pos.longitude, 34.26);
+            uiElements.hexCoords.textContent = `${hex.q}, ${hex.r}`;
+
+            const speedType = TerrainSpeedSystem.getHexSpeed({ lat: pos.latitude, lng: pos.longitude }, hex);
+            const config = TERRAIN_SPEED_CONFIG[speedType];
+            uiElements.terrainType.textContent = config.name;
+            uiElements.terrainType.style.color = config.color;
+        }
+
+        // Update Player Speed
+        if (uiElements.speedValue) {
+            const speed = info.currentSpeed || 1.0;
+            uiElements.speedValue.textContent = `${speed.toFixed(1)}x`;
+            if (speed >= 1.0) uiElements.speedValue.style.color = '#4ade80';
+            else if (speed <= 0.3) uiElements.speedValue.style.color = '#3b82f6';
+            else uiElements.speedValue.style.color = '#fb923c';
+        }
+
+        // Sync pause button state
+        if (uiElements.pauseBtn) {
+            const isPaused = timeSystem.isGamePaused();
+            uiElements.pauseBtn.textContent = isPaused ? '▶️ 继续' : '⏸️ 暂停';
+        }
+
+        // Sync speed button states
+        const currentSpeed = timeSystem.getSpeed();
+        if (uiElements.speed1xBtn) {
+            uiElements.speed1xBtn.classList.toggle('active', currentSpeed === 1);
+        }
+        if (uiElements.speed5xBtn) {
+            uiElements.speed5xBtn.classList.toggle('active', currentSpeed === 5);
+        }
+        if (uiElements.speed10xBtn) {
+            uiElements.speed10xBtn.classList.toggle('active', currentSpeed === 10);
+        }
+        if (uiElements.speed100xBtn) {
+            uiElements.speed100xBtn.classList.toggle('active', currentSpeed === 100);
+        }
+    }
+
+    document.getElementById('resign-btn')?.addEventListener('click', () => {
+        modalManager.showConfirm(
+            '下野',
+            '确定下野吗？将失去官职和势力。',
+            () => {
+                player.leaveFaction();
+                updateUI();
+            }
+        );
+    });
+
+    let lastTime = performance.now();
+    let lastUITime = 0;
+    const UI_UPDATE_INTERVAL = GAME_CONSTANTS.UI_UPDATE_INTERVAL; // Update UI every 100ms (10 FPS)
+
+    function gameLoop() {
+        const currentTime = performance.now();
+        const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+        lastTime = currentTime;
+
+        // Calculate game time with pause and speed multiplier
+        const isPaused = timeSystem.isGamePaused();
+        const timeScale = timeSystem.getSpeed();
+        const gameDeltaTime = isPaused ? 0 : deltaTime * timeScale;
+
+        timeSystem.update(deltaTime); // Time system always runs at normal speed
+        historicalEventManager.update(gameDeltaTime); // AI armies use game time (same as player)
+        player.update(gameDeltaTime); // Use game-adjusted deltaTime for player movement
+
+        // Camera follow logic for Call to Arms
+        if (player.isAutoMarching) {
+            const pos = player.getPosition();
+            map.getLeafletMap().panTo([pos.latitude, pos.longitude], { animate: false });
+        }
+
+        combatSystem.update(gameDeltaTime);
+        // playerRenderer.update();
+
+        // Update UI with throttling
+        if (currentTime - lastUITime >= UI_UPDATE_INTERVAL) {
+            updateUI();
+            lastUITime = currentTime;
+        }
+
+        requestAnimationFrame(gameLoop);
+    }
+    requestAnimationFrame(gameLoop);
+
+    // Initial update
+    updateUI();
+
+    document.getElementById('toggle-speed-overlay')?.addEventListener('click', () => {
+        speedOverlay.toggle();
+    });
+
+    document.getElementById('debug-color')?.addEventListener('click', () => {
+        if (speedOverlay.isEditing) {
+            document.getElementById('toggle-edit-mode')?.click();
+        }
+        colorDebugger.toggle();
+    });
+
+    const pauseBtn = document.getElementById('pause-btn');
+    pauseBtn?.addEventListener('click', () => {
+        const isPaused = pauseBtn.textContent?.includes('继续');
+        timeSystem.setPaused(!isPaused);
+        pauseBtn.textContent = !isPaused ? '▶️ 继续' : '⏸️ 暂停';
+    });
+
+    const speedBtns = {
+        1: document.getElementById('speed-1x'),
+        5: document.getElementById('speed-5x'),
+        10: document.getElementById('speed-10x'),
+        100: document.getElementById('speed-100x')
+    };
+
+    Object.entries(speedBtns).forEach(([speed, btn]) => {
+        btn?.addEventListener('click', () => {
+            timeSystem.setSpeed(Number(speed));
+            Object.values(speedBtns).forEach(b => b?.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    let uiVisible = true;
+    const uiToggleBtn = document.getElementById('ui-toggle-btn');
+    const hudEl = document.getElementById('hud');
+    const playerInfoEl = document.querySelector('.player-info');
+    const eventDisplayEl = document.getElementById('event-display');
+    const editorPanelEl = document.querySelector('.editor-panel');
+
+    function toggleUI() {
+        uiVisible = !uiVisible;
+        if (uiVisible) {
+            hudEl?.classList.remove('ui-hidden');
+            playerInfoEl?.classList.remove('ui-hidden');
+            eventDisplayEl?.classList.remove('ui-hidden');
+            editorPanelEl?.classList.remove('ui-hidden');
+            if (uiToggleBtn) uiToggleBtn.innerHTML = '👁️ 隐藏界面';
+        } else {
+            hudEl?.classList.add('ui-hidden');
+            playerInfoEl?.classList.add('ui-hidden');
+            eventDisplayEl?.classList.add('ui-hidden');
+            editorPanelEl?.classList.add('ui-hidden');
+            if (uiToggleBtn) uiToggleBtn.innerHTML = '👁️ 显示界面';
+        }
+    }
+
+    uiToggleBtn?.addEventListener('click', toggleUI);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'h' || e.key === 'H') {
+            if (document.activeElement?.tagName === 'INPUT' ||
+                document.activeElement?.tagName === 'TEXTAREA') {
+                return;
+            }
+            toggleUI();
+        }
+    });
+
+    const editorControls = document.getElementById('editor-controls');
+    const toggleEditBtn = document.getElementById('toggle-edit-mode');
+
+    function updateToolUI(tool: 'paint-normal' | 'paint-slow' | 'paint-water') {
+        const toolButtons = {
+            'paint-normal': document.getElementById('tool-paint-normal'),
+            'paint-slow': document.getElementById('tool-paint-slow'),
+            'paint-water': document.getElementById('tool-paint-water')
+        };
+        Object.values(toolButtons).forEach(btn => btn?.classList.remove('active'));
+        if (tool in toolButtons) {
+            toolButtons[tool as keyof typeof toolButtons]?.classList.add('active');
+        }
+    }
+
+    function updateBrushUI(size: 1 | 7 | 19) {
+        const brushButtons = {
+            1: document.getElementById('brush-small'),
+            7: document.getElementById('brush-medium'),
+            19: document.getElementById('brush-large')
+        };
+        Object.values(brushButtons).forEach(btn => btn?.classList.remove('active'));
+        brushButtons[size]?.classList.add('active');
+    }
+
+    function updateUndoRedoButtons() {
+        const undoBtn = document.getElementById('undo-btn') as HTMLButtonElement | null;
+        const redoBtn = document.getElementById('redo-btn') as HTMLButtonElement | null;
+        if (undoBtn) undoBtn.disabled = !speedOverlay.canUndo();
+        if (redoBtn) redoBtn.disabled = !speedOverlay.canRedo();
+    }
+
+    function updateModifiedCount() {
+        const countEl = document.getElementById('modified-count');
+        if (countEl) {
+            countEl.textContent = speedOverlay.getModifiedCount().toString();
+        }
+    }
+
+    if (toggleEditBtn) {
+        toggleEditBtn.addEventListener('click', () => {
+            if (!speedOverlay.isShowing()) {
+                speedOverlay.toggle();
+            }
+            const isEditMode = speedOverlay.toggleEditMode();
+            toggleEditBtn.textContent = isEditMode ? '退出编辑模式' : '进入编辑模式';
+            toggleEditBtn.classList.toggle('active', isEditMode);
+            if (editorControls) {
+                editorControls.style.display = isEditMode ? 'block' : 'none';
+            }
+            if (!isEditMode) {
+                speedOverlay.saveQuietly();
+            } else {
+                speedOverlay.setToolType('paint-normal');
+                updateToolUI('paint-normal');
+            }
+        });
+    }
+
+    document.getElementById('tool-paint-normal')?.addEventListener('click', () => {
+        speedOverlay.setToolType('paint-normal');
+        updateToolUI('paint-normal');
+    });
+
+    document.getElementById('tool-paint-slow')?.addEventListener('click', () => {
+        speedOverlay.setToolType('paint-slow');
+        updateToolUI('paint-slow');
+    });
+
+    document.getElementById('tool-paint-water')?.addEventListener('click', () => {
+        speedOverlay.setToolType('paint-water');
+        updateToolUI('paint-water');
+    });
+
+    document.getElementById('brush-small')?.addEventListener('click', () => {
+        speedOverlay.setBrushSize(1);
+        updateBrushUI(1);
+    });
+
+    document.getElementById('brush-medium')?.addEventListener('click', () => {
+        speedOverlay.setBrushSize(7);
+        updateBrushUI(7);
+    });
+
+    document.getElementById('brush-large')?.addEventListener('click', () => {
+        speedOverlay.setBrushSize(19);
+        updateBrushUI(19);
+    });
+
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+
+    undoBtn?.addEventListener('click', () => {
+        speedOverlay.undo();
+        updateUndoRedoButtons();
+        updateModifiedCount();
+    });
+
+    redoBtn?.addEventListener('click', () => {
+        speedOverlay.redo();
+        updateUndoRedoButtons();
+        updateModifiedCount();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key === 'z' && speedOverlay.isShowing()) {
+            e.preventDefault();
+            speedOverlay.undo();
+            updateUndoRedoButtons();
+            updateModifiedCount();
+        } else if (e.ctrlKey && e.key === 'y' && speedOverlay.isShowing()) {
+            e.preventDefault();
+            speedOverlay.redo();
+            updateUndoRedoButtons();
+            updateModifiedCount();
+        }
+    });
+
+    document.getElementById('save-to-file')?.addEventListener('click', () => {
+        speedOverlay.exportData();
+    });
+
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    document.getElementById('load-from-file')?.addEventListener('click', () => {
+        fileInput?.click();
+    });
+
+    fileInput?.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+            speedOverlay.importData(file);
+            fileInput.value = '';
+        }
+    });
+
+    document.getElementById('save-data')?.addEventListener('click', () => {
+        speedOverlay.save();
+    });
+
+    document.getElementById('export-data')?.addEventListener('click', () => {
+        speedOverlay.exportData();
+    });
+
+    document.getElementById('export-all-terrain')?.addEventListener('click', () => {
+        speedOverlay.exportAllTerrain();
+    });
+
+    document.getElementById('recover-data')?.addEventListener('click', () => {
+        if (confirm('从LocalStorage恢复数据？\n\n这将重新加载浏览器中保存的地形数据。')) {
+            location.reload();
+        }
+    });
+
+    document.getElementById('clear-data')?.addEventListener('click', () => {
+        if (confirm('确定要清除所有手动修改吗？此操作无法撤销！')) {
+            overrideManager.getAllOverrides().clear();
+            overrideManager.save();
+            location.reload();
+        }
+    });
+
+    const autoIdCheckbox = document.getElementById('toggle-auto-id') as HTMLInputElement;
+    if (autoIdCheckbox) {
+        autoIdCheckbox.checked = TerrainSpeedSystem.isAutoIdentificationEnabled();
+        autoIdCheckbox.addEventListener('change', (e) => {
+            const enabled = (e.target as HTMLInputElement).checked;
+            speedOverlay.setAutoIDEnabled(enabled);
+        });
+    }
+
+    map.getLeafletMap().on('moveend zoomend', () => {
+        if (speedOverlay.isShowing()) {
+            speedOverlay.update();
+            updateModifiedCount();
+            updateUndoRedoButtons();
+        }
+    });
+
+    document.getElementById('toggle-event-list-btn')?.addEventListener('click', (e) => {
+        const btn = e.currentTarget as HTMLButtonElement;
+        const panel = document.getElementById('event-display');
+        const content = document.getElementById('event-content');
+
+        if (!panel || !content) return;
+
+        panel.classList.toggle('expanded');
+        const isExpanded = panel.classList.contains('expanded');
+
+        if (isExpanded) {
+            btn.textContent = '▲';
+            const events = historicalEventManager.getEventHistory();
+            if (events.length === 0) {
+                content.innerHTML = '<div class="event-item">暂无历史事件</div>';
+            } else {
+                content.innerHTML = events.slice().reverse().map(e => {
+                    const seasonName = ['春', '夏', '秋', '冬'][e.season || 0];
+                    const era = e.year < 0 ? '公元前' : '公元';
+                    const absYear = Math.abs(e.year);
+                    const hasYearInDesc = /^((公元)?(前)?\d+年)/.test(e.description);
+                    const desc = hasYearInDesc ? e.description : `${era}${absYear}年${seasonName}: ${e.description}`;
+                    return `<div class="event-item">${desc}</div>`;
+                }).join('');
+            }
+        } else {
+            btn.textContent = '▼';
+            // 恢复显示最新事件
+            const events = historicalEventManager.getEventHistory();
+            if (events.length > 0) {
+                const lastEvent = events[events.length - 1];
+                // 使用 HistoricalEventManager 中的逻辑重新渲染最新事件
+                // 由于 updateEventUI 是私有的，我们这里手动模拟一下，或者最好是公开那个方法
+                // 为了简单起见，这里直接模拟 updateEventUI 的渲染逻辑
+                const seasonName = ['春', '夏', '秋', '冬'][lastEvent.season || 0];
+                const era = lastEvent.year < 0 ? '公元前' : '公元';
+                const absYear = Math.abs(lastEvent.year);
+                const hasYearInDesc = /^((公元)?(前)?\d+年)/.test(lastEvent.description);
+
+                if (hasYearInDesc) {
+                    content.innerHTML = `<div style="font-size: 0.9em;">${lastEvent.description}</div>`;
+                } else {
+                    content.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 5px;">${era}${absYear}年 ${seasonName}</div>
+                        <div style="font-size: 0.9em;">${lastEvent.description}</div>
+                    `;
+                }
+            } else {
+                content.innerHTML = '';
+            }
+        }
+    });
+
+    document.getElementById('bake-world')?.addEventListener('click', () => {
+        speedOverlay.bakeWorld();
+    });
+
+    window.game = {
+        map,
+        factionManager,
+        cityManager,
+        gridManager,
+        player,
+        legionRenderer,
+        speedOverlay,
+        colorSampler,
+        colorDebugger,
+        overrideManager,
+        timeSystem,
+        combatSystem
+    };
+
+    window.gameMap = map;
+    window.player = player;
+    window.speedOverlay = speedOverlay;
+    window.timeSystem = timeSystem;
+    window.npcManager = npcManager;
+    window.combatSystem = combatSystem;
+
+    console.log('✅ 游戏初始化完成');
+
+    // HMR for Historical Events
+    if (import.meta.hot) {
+        import.meta.hot.accept('./core/HistoricalEvents', (newModule) => {
+            if (newModule && newModule.HISTORICAL_EVENTS) {
+                console.log('🔥 HMR: Updating Historical Events...');
+                historicalEventManager.reloadEvents(newModule.HISTORICAL_EVENTS);
+            }
+        });
+    }
+});

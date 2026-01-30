@@ -1,0 +1,31 @@
+{
+  "name": "mapwar",
+  "version": "1.0.0",
+  "description": "MAPWAR 是一个正在搭建中的历史地图沙盘原型，目标是在真实地形图上重现春秋战国时期的势力、城市与兵力演化。当前代码侧重于最小可运行的演示：",
+  "main": "game.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "pinyin": "^4.0.0",
+    "pinyin-pro": "^3.28.0",
+    "pixi.js": "^8.14.2"
+  }
+}

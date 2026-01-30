@@ -1,0 +1,943 @@
+import { AssetLoader } from '../../core/AssetLoader';
+import { SPRITE_PATHS } from '../../config/GameConfig';
+import { FormationSystem } from '../../core/FormationSystem';
+import { GeneralDrawer } from '../GeneralDrawer';
+import { PhalanxVitality } from '../PhalanxVitality';
+import { LegionPhalanxStateManager, LegionUnitState } from './LegionPhalanxState';
+import { LegionType } from '../../types/UnitTypes';
+import { SpriteTinter } from '../../systems/tinting/SpriteTinter';
+import { FactionTintSystem } from '../../systems/tinting/FactionTintSystem';
+
+export type PhalanxAnimState = 'IDLE' | 'MOVE' | 'ATTACK' | 'DAMAGE' | 'DEATH' | 'CHARGE' | 'SHOOT';
+
+export class LegionPhalanxDrawer {
+
+    // [DYNAMIC ASSET SYSTEM]
+    // Key: unitAssetId (e.g. 'huaxia_infantry') -> Local Sprite Cache
+    private static unitSpriteCache: Map<string, {
+        MOVE: HTMLImageElement[],
+        ATTACK: HTMLImageElement[],
+        IDLE: HTMLImageElement[],
+        DAMAGE: HTMLImageElement[],
+        DEATH: HTMLImageElement[],
+        SECONDARY?: {
+            MOVE: HTMLImageElement[],
+            ATTACK: HTMLImageElement[],
+            IDLE: HTMLImageElement[],
+            DAMAGE: HTMLImageElement[],
+            DEATH: HTMLImageElement[],
+            SHOOT: HTMLImageElement[]
+        },
+        TERTIARY?: {
+            MOVE: HTMLImageElement[],
+            ATTACK: HTMLImageElement[],
+            IDLE: HTMLImageElement[],
+            DAMAGE: HTMLImageElement[],
+            DEATH: HTMLImageElement[],
+            SHOOT: HTMLImageElement[]
+        }
+    }> = new Map();
+
+    private static isLoaded = false;
+
+    public static async preload(): Promise<void> {
+        if (this.isLoaded) return;
+
+        const loadBatch = async (sourcePaths: readonly string[], targetArray: HTMLImageElement[]) => {
+            await AssetLoader.preloadImages([...sourcePaths]);
+            await Promise.all(sourcePaths.map(async (path, index) => {
+                const img = AssetLoader.getImage(path);
+                if (img) {
+                    const processed = await this.processImage(img);
+                    targetArray[index] = processed;
+                }
+            }));
+        };
+
+        console.log('🔄 LegionPhalanxDrawer: Processing Dynamic Unit Assets...');
+
+        // 1. Load Generic / Legacy Assets (if needed)
+        // ...
+
+        // 2. Load Granular Unit Assets from GameConfig.UNIT_ASSETS
+        if (SPRITE_PATHS.UNIT_ASSETS) {
+            for (const [key, assets] of Object.entries(SPRITE_PATHS.UNIT_ASSETS)) {
+                const config = assets as any;
+                const cacheEntry = {
+                    MOVE: [] as HTMLImageElement[],
+                    ATTACK: [] as HTMLImageElement[],
+                    IDLE: [] as HTMLImageElement[],
+                    DAMAGE: [] as HTMLImageElement[],
+                    DEATH: [] as HTMLImageElement[],
+                    SHOOT: [] as HTMLImageElement[],  // [NEW] For mounted archers
+                    CHARGE: [] as HTMLImageElement[], // [NEW] For cavalry charge animation
+                    SECONDARY: config.SECONDARY ? {
+                        MOVE: [] as HTMLImageElement[],
+                        ATTACK: [] as HTMLImageElement[],
+                        IDLE: [] as HTMLImageElement[],
+                        DAMAGE: [] as HTMLImageElement[],
+
+                        DEATH: [] as HTMLImageElement[],
+                        SHOOT: [] as HTMLImageElement[],
+                        CHARGE: [] as HTMLImageElement[] // [NEW] Added CHARGE support for Secondary
+                    } : undefined,
+                    TERTIARY: config.TERTIARY ? {
+                        MOVE: [] as HTMLImageElement[],
+                        ATTACK: [] as HTMLImageElement[],
+                        IDLE: [] as HTMLImageElement[],
+                        DAMAGE: [] as HTMLImageElement[],
+                        DEATH: [] as HTMLImageElement[],
+                        SHOOT: [] as HTMLImageElement[]
+                    } : undefined
+                };
+
+                const promises = [
+                    loadBatch(assets.MOVE, cacheEntry.MOVE),
+                    loadBatch(assets.ATTACK, cacheEntry.ATTACK),
+                    loadBatch(assets.IDLE, cacheEntry.IDLE),
+                    loadBatch(assets.DAMAGE, cacheEntry.DAMAGE),
+                    loadBatch(assets.DEATH, cacheEntry.DEATH),
+                ];
+
+                // [NEW] Load SHOOT and CHARGE if available
+                if (config.SHOOT) {
+                    promises.push(loadBatch(config.SHOOT, cacheEntry.SHOOT));
+                }
+                if (config.CHARGE) {
+                    promises.push(loadBatch(config.CHARGE, cacheEntry.CHARGE));
+                }
+
+                if (config.SECONDARY && cacheEntry.SECONDARY) {
+                    promises.push(loadBatch(config.SECONDARY.MOVE, cacheEntry.SECONDARY.MOVE));
+                    promises.push(loadBatch(config.SECONDARY.ATTACK, cacheEntry.SECONDARY.ATTACK));
+                    promises.push(loadBatch(config.SECONDARY.IDLE, cacheEntry.SECONDARY.IDLE));
+                    promises.push(loadBatch(config.SECONDARY.DAMAGE, cacheEntry.SECONDARY.DAMAGE));
+                    promises.push(loadBatch(config.SECONDARY.DEATH, cacheEntry.SECONDARY.DEATH));
+                    if (config.SECONDARY.SHOOT) {
+                        promises.push(loadBatch(config.SECONDARY.SHOOT, cacheEntry.SECONDARY.SHOOT));
+                    }
+                    if (config.SECONDARY.CHARGE) {
+                        promises.push(loadBatch(config.SECONDARY.CHARGE, cacheEntry.SECONDARY.CHARGE));
+                    }
+
+                }
+
+                // [NEW] TERTIARY Support (for 3-tier formations like Mixed)
+                if (config.TERTIARY && (cacheEntry as any).TERTIARY) {
+                    const tert = (cacheEntry as any).TERTIARY;
+                    promises.push(loadBatch(config.TERTIARY.MOVE, tert.MOVE));
+                    promises.push(loadBatch(config.TERTIARY.ATTACK, tert.ATTACK));
+                    promises.push(loadBatch(config.TERTIARY.IDLE, tert.IDLE));
+                    promises.push(loadBatch(config.TERTIARY.DAMAGE, tert.DAMAGE));
+                    promises.push(loadBatch(config.TERTIARY.DEATH, tert.DEATH));
+                    if (config.TERTIARY.SHOOT) {
+                        promises.push(loadBatch(config.TERTIARY.SHOOT, tert.SHOOT));
+                    }
+                }
+
+                await Promise.all(promises);
+                this.unitSpriteCache.set(key, cacheEntry);
+                console.log(`   Detailed asset loaded: ${key}`);
+            }
+        }
+
+        // [Xiyang Legion] Manual Load Hook
+        if (SPRITE_PATHS.UNIT_ASSETS['xiyang_legion']) {
+            await this.loadS8YDAssets('xiyang_legion');
+        }
+
+        // [NEW] Manually load PLAYER_GENERAL assets (since it is a special top-level config)
+        // This ensures the assets are available even if the dynamic loop above misses them.
+        if ((SPRITE_PATHS as any).PLAYER_GENERAL) {
+            const assets = (SPRITE_PATHS as any).PLAYER_GENERAL;
+            const cacheEntry = {
+                MOVE: [] as HTMLImageElement[],
+                ATTACK: [] as HTMLImageElement[],
+                IDLE: [] as HTMLImageElement[],
+                DAMAGE: [] as HTMLImageElement[],
+                DEATH: [] as HTMLImageElement[],
+            };
+            const promises = [
+                loadBatch(assets.MOVE, cacheEntry.MOVE),
+                loadBatch(assets.ATTACK, cacheEntry.ATTACK),
+                loadBatch(assets.IDLE, cacheEntry.IDLE),
+                loadBatch(assets.DAMAGE, cacheEntry.DAMAGE),
+                loadBatch(assets.DEATH, cacheEntry.DEATH),
+            ];
+            await Promise.all(promises);
+            this.unitSpriteCache.set('player_general', cacheEntry);
+            console.log('   Stats: Loaded special PLAYER_GENERAL assets.');
+        }
+
+        await GeneralDrawer.preload();
+        this.isLoaded = true;
+        console.log('✅ LegionPhalanxDrawer: All dynamic unit assets loaded.');
+    }
+
+    private static processImage(img: HTMLImageElement): Promise<HTMLImageElement> {
+        return new Promise((resolve) => {
+            if (!img.complete || img.naturalWidth === 0) { resolve(img); return; }
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { resolve(img); return; }
+            ctx.drawImage(img, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                if (data[i + 1] > 200 && data[i] < 100 && data[i + 2] < 100) data[i + 3] = 0;
+            }
+            ctx.putImageData(imageData, 0, 0);
+            const newImg = new Image();
+            newImg.onload = () => resolve(newImg);
+            newImg.src = canvas.toDataURL();
+        });
+    }
+
+    // [New Standard] 3x3 Grid Offset
+
+    /**
+     * [S8YD Special Loader]
+     * Loads raw frames (1.png...80.png) and stitches them into directional strips.
+     * Mapping from S8 (1-80) to Game Dir (0-7):
+     * 1-10:   NE (Dir 1)
+     * 11-20:  E  (Dir 2)
+     * 21-30:  SE (Dir 3)
+     * 31-40:  S  (Dir 4)
+     * 41-50:  SW (Dir 5)
+     * 51-60:  W  (Dir 6)
+     * 61-70:  NW (Dir 7) [Assumed]
+     * 71-80:  N  (Dir 0) [Assumed]
+     */
+    private static async loadS8YDAssets(key: string) {
+        const cacheEntry = this.unitSpriteCache.get(key) || {
+            MOVE: [], ATTACK: [], IDLE: [], DAMAGE: [], DEATH: []
+        };
+        this.unitSpriteCache.set(key, cacheEntry); // Ensure set
+
+        const loadImage = (src: string): Promise<HTMLImageElement> => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => {
+                    console.warn(`Failed to load S8YD frame: ${src}`);
+                    resolve(new Image()); // Fallback empty
+                };
+                img.src = src;
+            });
+        };
+
+        const stitchStrip = async (startId: number, count: number): Promise<HTMLImageElement> => {
+            const frames: HTMLImageElement[] = [];
+            for (let i = 0; i < count; i++) {
+                frames.push(await loadImage(`/SUCAI/S8YD/${startId + i}-1.png`));
+            }
+
+            // Wait for all to load
+            const loadedFrames = frames;
+
+            // Check first frame for dimensions
+            const w = loadedFrames[0].width;
+            const h = loadedFrames[0].height;
+            if (w === 0 || h === 0) return loadedFrames[0]; // Empty if failed
+
+            const canvas = document.createElement('canvas');
+            canvas.width = w * count;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+                loadedFrames.forEach((frame, idx) => {
+                    ctx.drawImage(frame, idx * w, 0);
+                });
+
+                // 2. Chroma Key Transparency (S8 Fix)
+                // Assuming Top-Left pixel (0,0) is background color
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const data = imageData.data;
+                const rKey = data[0];
+                const gKey = data[1];
+                const bKey = data[2];
+
+                const tolerance = 10; // Slight variance allowed
+
+                for (let i = 0; i < data.length; i += 4) {
+                    const r = data[i];
+                    const g = data[i + 1];
+                    const b = data[i + 2];
+
+                    if (Math.abs(r - rKey) <= tolerance &&
+                        Math.abs(g - gKey) <= tolerance &&
+                        Math.abs(b - bKey) <= tolerance) {
+                        data[i + 3] = 0; // Set Alpha to 0 (Transparent)
+                    }
+                }
+                ctx.putImageData(imageData, 0, 0);
+            }
+            const finalImg = new Image();
+            finalImg.src = canvas.toDataURL();
+            return finalImg;
+        };
+
+        // --- MOVE (1-80) ---
+        // Map groups to (Game Dir Index)
+        // Group ID (0-7): 0=1-10, 1=11-20...
+        // Directions:
+        // Group 0 (1-10)   -> NE (Dir 1)
+        // Group 1 (11-20)  -> E  (Dir 2)
+        // Group 2 (21-30)  -> SE (Dir 3)
+        // Group 3 (31-40)  -> S  (Dir 4)
+        // Group 4 (41-50)  -> SW (Dir 5)
+        // Group 5 (51-60)  -> W  (Dir 6)
+        // Group 6 (61-70)  -> NW (Dir 7) [Inferred]
+        // Group 7 (71-80)  -> N  (Dir 0) [Inferred]
+
+        const mapGroupToDir = [1, 2, 3, 4, 5, 6, 7, 0];
+
+        for (let group = 0; group < 8; group++) {
+            const startId = (group * 10) + 1; // 1, 11, 21...
+            const strip = await stitchStrip(startId, 10);
+            const gameDir = mapGroupToDir[group];
+            cacheEntry.MOVE[gameDir] = strip;
+        }
+
+        // For now, reuse MOVE strips for other states to avoid blanks
+        // Since user only provided move assets
+        cacheEntry.IDLE = [...cacheEntry.MOVE];
+        cacheEntry.ATTACK = [...cacheEntry.MOVE];
+        cacheEntry.DEATH = [...cacheEntry.MOVE];
+        cacheEntry.DAMAGE = [...cacheEntry.MOVE];
+    }
+
+    // [POOLED RENDERING] Reuse objects to reduce GC
+    private static renderPool: { y: number, drawParams: any }[] = [];
+    private static poolIndex = 0;
+
+    // [OFFSET CACHING] Cache grid calculations
+    // Key: `${index}_${rows}_${cols}_${spacingX}_${spacingY}_${direction}`
+    private static offsetCache: Map<string, { x: number, y: number }> = new Map();
+
+    private static getPooledItem(): { y: number, drawParams: any } {
+        if (this.poolIndex >= this.renderPool.length) {
+            this.renderPool.push({
+                y: 0,
+                drawParams: {
+                    img: null,
+                    sx: 0, sy: 0, sw: 0, sh: 0,
+                    dx: 0, dy: 0, dw: 0, dh: 0
+                }
+            });
+        }
+        return this.renderPool[this.poolIndex++];
+    }
+
+    private static resetPool(): void {
+        this.poolIndex = 0;
+    }
+
+    public static resetUnit(unitId: string): void {
+        LegionPhalanxStateManager.reset(unitId);
+    }
+
+    // [NEW] Helper: Get Frame Count based on Aspect Ratio
+    private static getFrameCount(img: HTMLImageElement | null): number {
+        if (!img || img.naturalWidth === 0) return 1;
+        // If width approx equals height (< 2x), it's single frame (S10DB/NPC)
+        if (img.naturalWidth < img.naturalHeight * 2) return 1;
+        // S8 Assets (10 frames) - Width is roughly 10x Height
+        if (img.naturalWidth > img.naturalHeight * 9) return 10;
+        // Standard convention: 8 frames
+        return 8;
+    }
+
+    /**
+     * Draw a Legion Phalanx (3x3 Grid or Hex)
+     */
+    public static draw(
+        unitId: string,
+        ctx: CanvasRenderingContext2D,
+        center: { x: number, y: number },
+        state: PhalanxAnimState,
+        direction: number,
+        scale: number,
+        troops: number,
+        tick: number = 0,
+        hasGeneral: boolean = false,
+        isFighting: boolean = false,
+        projectFn?: (lat: number, lng: number) => { x: number, y: number },
+        unprojectFn?: (x: number, y: number) => { lat: number, lng: number },
+        legionType: LegionType = 'infantry',
+        factionId: string = 'zhonghua',
+        unitAssetsId: string = 'huaxia_infantry',
+        isPlayer: boolean = false // [NEW] Identify plain player units
+    ): void {
+        if (!this.isLoaded) return;
+
+        // --- 1. SETUP & CONFIG ---
+        let count = 9; // Default for Infantry/Mixed
+
+        // [FORCE COUNT] Cavalry is strictly 6 units (1-2-3 Triangle)
+        if (legionType === 'cavalry' || legionType === 'huaxia_cavalry' || legionType === 'zhonghua_cavalry' || legionType === 'huihui_cavalry' || legionType === 'chaoxian_cavalry' || legionType === 'liang_cavalry' || legionType === 'wei_cavalry' || legionType === 'tujue_cavalry' || legionType === 'tian_cavalry' || legionType === 'xiyu_cavalry') {
+            count = 6;
+        }
+        // [FORCE COUNT] Mixed is strictly 7 units (2-3-2 Hex)
+        if (legionType === 'mixed' || legionType === 'huaxia_mixed' || legionType === 'zhonghua_mixed' || legionType === 'huihui_mixed') {
+            count = 7;
+        }
+        // [FORCE COUNT] Xiyang Legion uses S8 Assets (Single sprite = 5 people / 5人一张图)
+        // Unlike S10 single-soldier sprites, this needs Count=1 to render one squad sprite.
+        if (legionType === 'xiyang_legion') {
+            count = 1;
+        }
+
+        const rows = 3;
+        const cols = 3; // Basic grid dimension for spatial logic
+
+        // Retrieve Asset Cache
+        let assets = this.unitSpriteCache.get(unitAssetsId);
+
+        // Fallback Logic: Handle faction-prefixed types (huaxia_mixed -> try 'huaxia_mixed' directly)
+        if (!assets) {
+            // First try the legionType directly (e.g., 'huaxia_mixed')
+            assets = this.unitSpriteCache.get(legionType);
+        }
+        if (!assets) {
+            // Then try generic huaxia version of base type (e.g., 'mixed' -> 'huaxia_mixed')
+            const baseType = legionType.replace(/^(huaxia|zhonghua)_/, '');
+            const genericId = `huaxia_${baseType}`;
+            assets = this.unitSpriteCache.get(genericId);
+        }
+        if (!assets) {
+            // Final fallback to infantry
+            assets = this.unitSpriteCache.get('huaxia_infantry');
+        }
+        if (!assets) return;
+
+        // Base Dimension Reference (from Primary Idle)
+        const refSprite = assets.IDLE[direction] || assets.IDLE[0];
+        if (!refSprite) return;
+
+        const refTotalFrames = this.getFrameCount(refSprite);
+        const baseHeight = 100; // Standard size for all units
+
+        // [DYNAMIC RATIO]
+        // Do NOT force unitRatio here. We calculate it per-sprite in the loop.
+        // We just need a rough spacing estimation here.
+        // Assuming typical sprite is roughly square-ish or 0.8 ratio.
+        const estRatio = 0.8;
+        const renderH = baseHeight * scale;
+        const estRenderW = renderH * estRatio;
+
+        // Spacing based on estimated width
+        const spacingX = estRenderW * 0.55;
+        const spacingY = renderH * 0.35;
+
+        // --- 2. UPDATE STATE ---
+        const currentState = LegionPhalanxStateManager.update(
+            unitId, troops, rows, cols, count, direction, tick, isFighting, center, unprojectFn,
+            (idx) => this.getFormationOffset(idx, spacingX, spacingY, direction, legionType)
+        );
+
+        this.resetPool();
+        const activeItems: { y: number, drawParams: any }[] = [];
+        const totalSlots = currentState.slots.length;
+
+        // --- 3. RENDER LOOP ---
+        for (let i = 0; i < totalSlots; i++) {
+            const slot = currentState.slots[i];
+
+            // A. Calculate Position
+            let drawX: number, drawY: number;
+            let dynamicScale = 1.0; // [NEW] Dynamic Scale for Animation
+
+            // Base Offset Cache Key Suffix (to differentiate fighting state if we were caching fighting, but we do it dynamically here)
+            const baseOffset = this.getFormationOffset(i, spacingX, spacingY, direction, legionType);
+            drawX = center.x + baseOffset.x;
+            drawY = center.y + baseOffset.y;
+
+            if ((slot.state === 'DEAD' || slot.state === 'DYING') && slot.deadLat && slot.deadLng && projectFn) {
+                const proj = projectFn(slot.deadLat, slot.deadLng);
+                drawX = proj.x;
+                drawY = proj.y;
+            } else if (isFighting && slot.state !== 'DEAD' && slot.state !== 'DYING') {
+                // [COMBAT ANIMATION LOGIC]
+
+                const isMixed = legionType === 'mixed' || legionType === 'huaxia_mixed' || legionType === 'zhonghua_mixed' || legionType === 'huihui_mixed';
+                const isCavalry = legionType === 'cavalry' || legionType === 'huaxia_cavalry' || legionType === 'zhonghua_cavalry' || legionType === 'huihui_cavalry' || legionType === 'archer_cavalry' || legionType === 'chaoxian_cavalry' || legionType === 'liang_cavalry' || legionType === 'wei_cavalry' || legionType === 'tujue_cavalry' || legionType === 'tian_cavalry' || legionType === 'xiyu_cavalry';
+                const isInfantry = !isMixed && !isCavalry;
+
+                // 1. MELEE CROWDING (Infantry Only: 2nd Rank Flankers Crowd Gaps)
+                if (isInfantry) {
+                    // Index 4 (Center/General) stays put.
+                    // Index 3 (Left Wing of 2nd Rank) -> Gap between 0 and 1 (Front Rank Left-Center)
+                    // Index 5 (Right Wing of 2nd Rank) -> Gap between 1 and 2 (Front Rank Center-Right)
+
+                    let target1Idx = -1;
+                    let target2Idx = -1;
+
+                    if (i === 3) {
+                        target1Idx = 0;
+                        target2Idx = 1;
+                    } else if (i === 5) {
+                        target1Idx = 1;
+                        target2Idx = 2;
+                    }
+
+                    if (target1Idx !== -1) {
+                        // Calculate Midpoint of the Gap
+                        const p1 = this.getFormationOffset(target1Idx, spacingX, spacingY, direction, legionType);
+                        const p2 = this.getFormationOffset(target2Idx, spacingX, spacingY, direction, legionType);
+
+                        const gapX = (p1.x + p2.x) / 2;
+                        const gapY = (p1.y + p2.y) / 2;
+
+                        // Move towards the gap (crowdFactor 0.8 to step nearly fully in)
+                        const myBase = baseOffset;
+                        const crowdFactor = 0.8;
+
+                        drawX += (gapX - myBase.x) * crowdFactor;
+                        drawY += (gapY - myBase.y) * crowdFactor;
+                    }
+                }
+
+                // 2. CAVALRY CHARGE (Refined: Forward Surge, Reduced Range)
+                if (isCavalry || (isMixed && i >= 2 && i < 5) || legionType === 'riben_infantry') {
+                    const cycleDur = 2000;
+                    // Add phase offset so they don't move in unison
+                    const unitPhase = (i * 0.35) * 1000;
+                    const phase = ((tick + unitPhase) % cycleDur) / cycleDur;
+
+                    // [CHARGE DIRECTION] Use correct Forward vector based on formation rotation
+                    // formationAngle is "Right" (Row axis), so -PI/2 is "Forward" (Up/Front axis)
+                    const formationAngle = (direction + 1) * Math.PI / 4;
+                    const chargeAngle = formationAngle - Math.PI / 2;
+
+                    // [USER REQUEST] "2nd/3rd rows should charge to 1st row"
+                    // Calculate "Leapfrog" distance based on Row Index
+                    let rankMultiplier = 0.5; // Default (Row 1 / Front)
+
+                    if (isCavalry) {
+                        // 1-2-3 Formation
+                        if (i === 0) rankMultiplier = 0.3; // Tip: Small surge
+                        else if (i >= 1 && i <= 2) rankMultiplier = 1.2; // Row 2: Surge past row 1 (~1.0 spacing)
+                        else if (i >= 3) rankMultiplier = 2.0; // Row 3: Surge past row 1 (~2.0 spacing)
+                    }
+
+                    // Base Range is relative to spacingY (approx 1 row depth)
+                    const baseSurge = spacingY * 1.2;
+                    const chargeRange = baseSurge * rankMultiplier;
+
+                    // Use Sine^2 for sharper "Poke" and slower retreat? Or standard Sine?
+                    // User said "Charge then Retreat". Sine is fine.
+                    // Math.sin(0..PI) is 0->1->0.
+                    const surge = Math.max(0, Math.sin(phase * Math.PI * 2)); // Only positive half? No, sin is -1 to 1.
+                    // We want 0 -> 1 -> 0.
+                    // Let's use: (sin(t) + 1) / 2 ? No that's continuous forward.
+                    // We want "Attack Lunge".
+                    // Let's use simple abs(sin) or just max(0, sin)
+
+                    // Actually, simple Sine * Range moves back and forth around center. 
+                    // We want "Forward from center, then back to center".
+                    // So we need 0 -> 1 -> 0.
+                    const rawSin = Math.sin(phase * Math.PI * 2); // -1 to 1
+
+                    // Allow slight backward movement for "gathering momentum" (-0.2 -> 1.0)
+                    let surgeFactor = rawSin;
+                    if (surgeFactor < 0) surgeFactor *= 0.2; // Dampen backward swing
+
+                    drawX += Math.cos(chargeAngle) * (surgeFactor * chargeRange);
+                    drawY += Math.sin(chargeAngle) * (surgeFactor * chargeRange);
+
+                    // [USER REQUEST] "Add specific scaling effect"
+                    // When surging forward (surgeFactor > 0), scale UP (simulating lunge/proximity).
+                    if (surgeFactor > 0) {
+                        dynamicScale = 1.0 + (surgeFactor * 0.15); // Max 15% scale boost
+                    }
+                }
+
+                // 3. JITTER (Increased for chaos)
+                const seed = (i * 9301 + 49297) % 233280;
+                const rnd = seed / 233280.0;
+                const jitterAmt = 8 * (spacingX / 35); // Increased 6->8
+
+                drawX += (rnd - 0.5) * jitterAmt;
+                drawY += ((1.0 - rnd) - 0.5) * jitterAmt;
+            }
+
+            // B. Select Sprite Set (Primary vs Secondary vs Tertiary)
+            let currentSet = assets;
+            const isMixed = legionType === 'mixed' || legionType === 'huaxia_mixed' || legionType === 'zhonghua_mixed';
+
+            if (isMixed) {
+                // Mixed Logic: 2-3-2 (Front-Mid-Back)
+                // Row 0 (0-1): Primary (Infantry)
+                // Row 1 (2-4): Secondary (Cavalry)
+                // Row 2 (5-6): Tertiary (Archer/Crossbow)
+                if (i >= 2 && i < 5) {
+                    currentSet = assets.SECONDARY || assets;
+                } else if (i >= 5) {
+                    currentSet = (assets as any).TERTIARY || assets.SECONDARY || assets;
+                }
+            } else {
+                // Infantry / Cavalry Logic
+                // Use Secondary for Back Rows (Index >= 6 for 3x3 grid)
+                // Cavalry uses Primary mostly but if config has Secondary? Usually Cavalry is 6 units 1-2-3 (all Primary/Same).
+                // Infantry uses Secondary for back row Crossbows.
+                if (assets.SECONDARY && i >= 6) {
+                    currentSet = assets.SECONDARY;
+                }
+            }
+
+            // [SPECIAL LOGIC] Tujue/Tian/Xiyu Mixed Cavalry (Wedge 1-2-3)
+            // Front (0,1,2) = Primary
+            if ((legionType === 'tujue_cavalry' || legionType === 'tian_cavalry' || legionType === 'xiyu_cavalry') && assets.SECONDARY && i >= 3) {
+                currentSet = assets.SECONDARY;
+            }
+
+            // [PLAYER GENERAL OVERRIDE]
+            // Show General at center position for ALL units (quick fix)
+            {
+                let isGeneralPos = false;
+                // Identify General Position based on Formation Type
+                const isMix = legionType === 'mixed' || legionType === 'huaxia_mixed' || legionType === 'zhonghua_mixed';
+                const isCav = legionType === 'cavalry' || legionType === 'huaxia_cavalry' || legionType === 'zhonghua_cavalry' || legionType === 'huihui_cavalry' || legionType === 'archer_cavalry' || legionType === 'chaoxian_cavalry' || legionType === 'liang_cavalry' || legionType === 'wei_cavalry' || legionType === 'tujue_cavalry' || legionType === 'tian_cavalry' || legionType === 'xiyu_cavalry';
+                const isXiyang = legionType === 'xiyang_legion'; // [NEW] Check
+
+                if (!isXiyang) { // [MODIFIED] Skip General for Xiyang
+                    if (isMix) {
+                        if (i === 3) isGeneralPos = true; // Center of Mixed (2-3-2)
+                    } else if (isCav) {
+                        if (i === 0) isGeneralPos = true; // Tip of Wedge (1-2-3)
+                    } else {
+                        if (i === 4) isGeneralPos = true; // Center of Infantry (3x3)
+                    }
+                }
+
+                if (isGeneralPos) {
+                    const genAssets = this.unitSpriteCache.get('player_general');
+                    if (genAssets) currentSet = genAssets; // Override
+                }
+            }
+
+            // C. Select Specific Sprite based on State
+            // Note: Use 'direction' index
+            let rawSprite: HTMLImageElement | undefined;
+            let animState = state; // Default to global state
+
+            // Override state for dying/dead units
+            if (slot.state === 'DYING' || slot.state === 'DEAD') {
+                // [USER REQUEST] Use random death direction for variety
+                const deathDir = slot.deathDirection ?? direction;
+                rawSprite = currentSet.DEATH[deathDir] || currentSet.DEATH[0];
+                animState = 'DEATH';
+            } else if (state === 'DAMAGE') {
+                rawSprite = currentSet.DAMAGE[direction] || currentSet.DAMAGE[0];
+            } else if (state === 'ATTACK') {
+                // [COMBAT ANIMATION CYCLE] Generic logic: If unit has both SHOOT and CHARGE assets, use the cycle.
+                // This covers huihui_cavalry AND huihui_mixed secondary (mounted archers).
+                if ((currentSet as any).SHOOT?.length > 0 && (currentSet as any).CHARGE?.length > 0) {
+                    // 4-phase cycle: SHOOT (0-25%) -> CHARGE (25-50%) -> ATTACK (50-75%) -> SHOOT (75-100%)
+                    const cycleDuration = 4000; // 4 seconds per full cycle
+                    const cyclePhase = (tick % cycleDuration) / cycleDuration;
+
+                    if (cyclePhase < 0.25) {
+                        // Phase 1: SHOOT
+                        rawSprite = (currentSet as any).SHOOT[direction] || (currentSet as any).SHOOT[0];
+                    } else if (cyclePhase < 0.50) {
+                        // Phase 2: CHARGE
+                        rawSprite = (currentSet as any).CHARGE[direction] || (currentSet as any).CHARGE[0];
+                    } else if (cyclePhase < 0.75) {
+                        // Phase 3: ATTACK
+                        rawSprite = currentSet.ATTACK[direction] || currentSet.ATTACK[0];
+                    } else {
+                        // Phase 4: SHOOT
+                        rawSprite = (currentSet as any).SHOOT[direction] || (currentSet as any).SHOOT[0];
+                    }
+                } else if ((currentSet as any).SHOOT && (currentSet as any).SHOOT.length > 0) {
+                    // Generic SHOOT for other archers
+                    rawSprite = (currentSet as any).SHOOT[direction] || (currentSet as any).SHOOT[0];
+                } else {
+                    rawSprite = currentSet.ATTACK[direction] || currentSet.ATTACK[0];
+                }
+            } else if (state === 'MOVE') {
+                rawSprite = currentSet.MOVE[direction] || currentSet.MOVE[0];
+            } else {
+                // IDLE
+                rawSprite = currentSet.IDLE[direction] || currentSet.IDLE[0];
+            }
+
+            // Fallback to IDLE if specific action missing
+            if (!rawSprite && state !== 'IDLE') {
+                rawSprite = currentSet.IDLE[direction] || currentSet.IDLE[0];
+            }
+
+            if (!rawSprite || !rawSprite.complete || rawSprite.naturalWidth === 0) continue;
+
+            // D. Tinting (Apply Tint)
+            // Ideally we cache this, but SpriteTinter has internal cache
+            const tintedSprite = SpriteTinter.getTintedSprite(rawSprite, factionId);
+            if (!tintedSprite) continue;
+
+            // E. Frame Calculation
+            // Independent check per sprite
+            const spriteTotalFrames = this.getFrameCount(tintedSprite);
+            let currentFrameIndex = 0;
+
+            if (slot.state === 'ALIVE') {
+                if (animState === 'MOVE' || animState === 'ATTACK') {
+                    // Animate
+                    const stagger = i * 2;
+                    currentFrameIndex = Math.floor((tick / 150) + stagger) % spriteTotalFrames;
+                } else {
+                    // IDLE: Force Frame 0
+                    currentFrameIndex = 0;
+                }
+            } else if (slot.state === 'DYING' || slot.state === 'DEAD') {
+                // Death Animation
+                if (spriteTotalFrames === 1) {
+                    currentFrameIndex = 0; // Single frame corpse
+                } else {
+                    const timeDead = tick - slot.stateStartTime;
+                    const deathFrame = Math.floor(timeDead / 150);
+                    currentFrameIndex = Math.min(deathFrame, spriteTotalFrames - 1);
+                }
+
+                // Transition to fully DEAD if anim done
+                if (currentFrameIndex >= spriteTotalFrames - 1) {
+                    slot.state = 'DEAD';
+                }
+            }
+
+            // F. Prepare Draw
+            const frameW = tintedSprite.width / spriteTotalFrames;
+            const frameH = tintedSprite.height;
+            const frameCol = currentFrameIndex;
+
+            // Pool Item
+            const item = this.getPooledItem();
+            item.y = drawY + renderH / 2;
+
+            item.drawParams.img = tintedSprite;
+            item.drawParams.sx = frameCol * frameW;
+            item.drawParams.sy = 0;
+            item.drawParams.sw = frameW;
+            item.drawParams.sh = frameH;
+
+            // [VISUAL BALANCE & PERSPECTIVE]
+            // Scale Logic Update for 3-Tier Mixed
+            // [VISUAL BALANCE & PERSPECTIVE]
+            // Scale Logic Update: Restored Differential Scaling with Correct Anchor
+            let scalingFactor = 1.2; // Default Melee (Primary)
+
+            // Detect if this slot uses a "Secondary" or "Tertiary" asset set (usually Ranged units in back rows)
+            // Visual Analysis confirmed these assets are naturally larger, so they need 0.9 scale vs 1.2 scale.
+
+            // Logic: Check if we assigned a Secondary/Tertiary set earlier in the loop
+            // Since we don't have direct access to 'currentSet' source type here easily without re-checking logic,
+            // we rely on the specific row index and legion type logic mirroring the asset selection.
+
+            const isMixedLegion = legionType === 'mixed' || legionType === 'huaxia_mixed' || legionType === 'zhonghua_mixed' || legionType === 'huihui_mixed';
+            const isInfantryLegion = legionType === 'infantry' || legionType === 'huaxia_infantry' || legionType === 'zhonghua_infantry' || legionType === 'tianchao_infantry' || legionType === 'yuenan_infantry' || legionType === 'dianmian_infantry' || legionType === 'zhou_infantry' || legionType === 'qi_infantry' || legionType === 'shu_infantry' || legionType === 'song_infantry' || legionType === 'jin_infantry' || legionType === 'panjun_infantry' || legionType === 'e_infantry' || legionType === 'yue_infantry';
+
+            if (isMixedLegion) {
+                // Mixed: Back row (Tertiary/Crossbow) -> Scale 0.9
+                if (i >= 5) {
+                    scalingFactor = 0.9;
+                }
+            } else if (isInfantryLegion) {
+                // Infantry: Back row (Secondary/Crossbow) -> Scale 0.9
+                // Note: index >= 6 logic for 3x3 grid back row
+                if (i >= 6) {
+                    scalingFactor = 0.9;
+                }
+            }
+
+            // Exception: Nanman vine armor is naturally huge, keep slightly smaller if needed
+            // Also Song/E/Yue/etc if they need to match Yuenan scale
+            if ((unitAssetsId === 'yuenan_infantry' || unitAssetsId === 'dianmian_infantry') && i < 6) {
+                scalingFactor = 1.0;
+            }
+            // Song/E/Shu/Yue Infantry: Front row scale 0.9 (User Request)
+            if ((unitAssetsId === 'song_infantry' || unitAssetsId === 'e_infantry' || unitAssetsId === 'shu_infantry' || unitAssetsId === 'yue_infantry') && i < 6) {
+                scalingFactor = 0.9;
+            }
+            // Riben: Force 1.0
+            if (unitAssetsId === 'riben_infantry') {
+                scalingFactor = 1.0;
+            }
+            // Xiyang (S8YD): Force 2.2 (User Request - Magnify Again)
+            if (unitAssetsId === 'xiyang_legion') {
+                scalingFactor = 2.2;
+            }
+
+            // [DYNAMIC RENDERING]
+            scalingFactor *= dynamicScale; // [NEW] Apply dynamic scale
+
+            // Calculate Render Width based on ACTUAL sprite aspect ratio.
+            const currentRatio = frameW / frameH;
+            const scaledRenderH = renderH * scalingFactor;
+            const scaledRenderW = scaledRenderH * currentRatio;
+
+            item.drawParams.dx = drawX - scaledRenderW / 2;
+
+            // Optimized Anchor: 0.9 (Feet) ensures alignment regardless of scale
+            let anchorY = 0.90;
+            // [Adjust] Xiyang Legion (S8YD) needs to be lower (larger dy) relative to flag
+            if (unitAssetsId === 'xiyang_legion') {
+                anchorY = 0.60; // Move down by anchoring closer to center
+            }
+
+            item.drawParams.dy = drawY - scaledRenderH * anchorY;
+            item.drawParams.dw = scaledRenderW;
+            item.drawParams.dh = scaledRenderH;
+
+            // [DEBUG] One-time dimension check
+            if (!(LegionPhalanxDrawer as any)._debugLogDone && unitAssetsId === 'huaxia_infantry' && (i === 0 || i === 6)) {
+                console.log(`🔍 [LPD Analysis] Slot ${i} (${i === 0 ? 'Infantry' : 'Crossbow'}):`,
+                    `NatSize: ${tintedSprite.width}x${tintedSprite.height}`,
+                    `Frames: ${spriteTotalFrames}`,
+                    `FrameSize: ${frameW.toFixed(1)}x${frameH}`,
+                    `Ratio: ${(frameW / frameH).toFixed(2)}`,
+                    `Render: ${item.drawParams.dw.toFixed(1)}x${item.drawParams.dh.toFixed(1)}`
+                );
+                if (i === 6) (LegionPhalanxDrawer as any)._debugLogDone = true;
+            }
+
+            activeItems.push(item);
+        }
+
+        // --- 4. FLUSH ---
+        activeItems.sort((a, b) => a.y - b.y);
+        for (let i = 0; i < activeItems.length; i++) {
+            const p = activeItems[i].drawParams;
+            ctx.drawImage(p.img, p.sx, p.sy, p.sw, p.sh, p.dx, p.dy, p.dw, p.dh);
+        }
+    }
+
+    // [NEW] Helper to get General's visual offset from center
+    public static getGeneralOffset(legionType: LegionType, direction: number, scale: number): { x: number, y: number } {
+        const baseHeight = 100;
+        const estRatio = 0.8;
+        const renderH = baseHeight * scale;
+        const estRenderW = renderH * estRatio;
+        const spacingX = estRenderW * 0.55;
+        const spacingY = renderH * 0.35;
+
+        let index = 4; // Default Infantry Center (Index 4 in 3x3)
+        const type = legionType;
+
+        const isCav = type === 'cavalry' || type === 'huaxia_cavalry' || type === 'zhonghua_cavalry' || type === 'huihui_cavalry' || type === 'archer_cavalry' || type === 'chaoxian_cavalry' || type === 'liang_cavalry' || type === 'wei_cavalry' || type === 'tujue_cavalry' || type === 'tian_cavalry' || type === 'xiyu_cavalry';
+        const isMix = type === 'mixed' || type === 'huaxia_mixed' || type === 'zhonghua_mixed' || type === 'huihui_mixed';
+
+        if (isMix) {
+            index = 3; // Center of Mixed (2-3-2)
+        } else if (isCav) {
+            index = 0; // Tip of Wedge (1-2-3)
+        } else {
+            index = 4; // Center of Infantry (3x3)
+        }
+
+        const offset = this.getFormationOffset(index, spacingX, spacingY, direction, type);
+
+        // [FIX] Add vertical correction - flag should be at head height, not feet
+        // Negative Y moves up in screen coordinates
+        const headOffset = renderH * 0.15; // 15% of render height upward
+
+        return { x: offset.x, y: offset.y - headOffset };
+    }
+
+
+    // [NEW] Custom Formation Offset Calculation
+    private static getFormationOffset(index: number, spacingX: number, spacingY: number, direction: number, type: LegionType): { x: number, y: number } {
+        const key = `${index}_${direction}_${spacingX.toFixed(2)}_${spacingY.toFixed(2)}_${type}`;
+
+        if (this.offsetCache.has(key)) {
+            return this.offsetCache.get(key)!;
+        }
+
+        let originalX = 0;
+        let originalY = 0;
+
+        // --- FORMATION LOGIC ---
+        // [Xiyang Legion] Single Unit -> Center (0,0)
+        if (type === 'xiyang_legion') {
+            return { x: 0, y: 0 };
+        }
+
+        // Check for Cavalry types
+        if (type === 'cavalry' || type === 'huaxia_cavalry' || type === 'zhonghua_cavalry' || type === 'huihui_cavalry' || type === 'chaoxian_cavalry' || type === 'liang_cavalry' || type === 'wei_cavalry' || type === 'tujue_cavalry' || type === 'tian_cavalry' || type === 'xiyu_cavalry') {
+            // [WEDGE / ISOSCELES TRIANGLE] (箭头/等腰三角)
+            // Goal: 1-2-3 shape.
+            // With 8 units usually: 1-2-3-2 (Diamond/Arrow tail) looks best and symmetric.
+
+            let r = 0, c = 0;
+            const layout = [
+                { r: 0, c: 0 },         // 0: Tip (Center)
+                { r: 1, c: -1 }, { r: 1, c: 1 }, // 1,2: 2nd Row (Symm)
+                { r: 2, c: -2 }, { r: 2, c: 0 }, { r: 2, c: 2 }, // 3,4,5: 3rd Row (Base of triangle)
+            ];
+
+            // Fallback for >6 units (just pile them in back rows roughly centered)
+            // But count is forced to 6 now, so this won't be used mostly.
+            const pos = layout[index] || { r: Math.floor(index / 3) + 1, c: (index % 3 - 1) * 2 };
+
+            // Center the wedge vertically around Pivot
+            // Row 0 is front. Row 2 is back. Center is Row 1.
+            originalY = (pos.r - 1.0) * spacingY;
+            // Use 0.7 factor for wider triangle (Isosceles/Equilateral feel)
+            originalX = pos.c * spacingX * 0.7;
+
+        } else if (type === 'mixed' || type === 'huaxia_mixed' || type === 'zhonghua_mixed' || type === 'huihui_mixed') {
+            // [HEX / 2-3-2] (圆润/六边形)
+            // Row 0: 2 units (Index 0,1)
+            // Row 1: 3 units (Index 2,3,4)
+            // Row 2: 2 units (Index 5,6)
+            // Total 7 units visible usually. If count=9, distribute extras?
+            // Let's stick to 2-3-2-2 or hide excess.
+            // Mapping for 9 units: 2-3-2-2
+
+            let r = 0, c = 0; // c is relative from center
+
+            if (index < 2) { // Row 0 (Front): 2 units
+                r = -1.5; c = (index === 0) ? -0.5 : 0.5;
+            } else if (index < 5) { // Row 1 (Mid): 3 units
+                r = -0.5; c = (index - 3); // Correct: 2->-1, 3->0, 4->1
+            } else if (index < 7) { // Row 2 (Back): 2 units
+                r = 0.5; c = (index === 5) ? -0.5 : 0.5;
+            } else { // Row 3 (Tail): remaining
+                r = 1.5; c = ((index - 7) % 2 === 0) ? -0.5 : 0.5;
+            }
+
+            originalX = c * spacingX;
+            originalY = r * spacingY;
+
+        } else {
+            // [INFANTRY / DEFAULT] (3x3 Grid)
+            const rows = 3;
+            const cols = 3;
+            const r = Math.floor(index / cols);
+            const c = index % cols;
+
+            const centerX = (cols - 1) / 2;
+            const centerY = (rows - 1) / 2;
+            originalX = (c - centerX) * spacingX;
+            originalY = (r - centerY) * spacingY;
+        }
+
+        // [ROTATION]
+        // Rotate the formation based on direction
+        const angle = (direction + 1) * Math.PI / 4;
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+
+        const result = {
+            x: originalX * cos - originalY * sin,
+            y: originalX * sin + originalY * cos
+        };
+
+        if (this.offsetCache.size > 2000) this.offsetCache.clear();
+        this.offsetCache.set(key, result);
+
+        return result;
+    }
+}

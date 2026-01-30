@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图诊断</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        body { margin: 0; padding: 0; font-family: monospace; }
+        #map { width: 100vw; height: 70vh; background: #1e293b; }
+        #console {
+            height: 30vh;
+            background: #0f172a;
+            color: #10b981;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .error { color: #ef4444; }
+        .success { color: #10b981; }
+        .info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="console"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script>
+        const consoleDiv = document.getElementById('console');
+
+        function log(msg, type = 'info') {
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            consoleDiv.appendChild(line);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            console.log(msg);
+        }
+
+        log('🗺️ 开始地图诊断...', 'info');
+
+        // 测试1: 直接访问瓦片文件
+        const testUrls = [
+            '/9dixingtu/Google Terrain Maps without labels  roads and POI  512px/401/201.jpg',
+            '/9dixingtu/Google%20Terrain%20Maps%20without%20labels%20%20roads%20and%20POI%20%20512px/401/201.jpg'
+        ];
+
+        log('测试瓦片URL访问...', 'info');
+        testUrls.forEach((url, i) => {
+            const img = new Image();
+            img.onload = () => log(`✅ URL ${i+1} 加载成功: ${url}`, 'success');
+            img.onerror = () => log(`❌ URL ${i+1} 加载失败: ${url}`, 'error');
+            img.src = url;
+        });
+
+        // 测试2: Leaflet地图
+        setTimeout(() => {
+            log('初始化Leaflet地图...', 'info');
+
+            const map = L.map('map', {
+                center: [34.26, 108.94],
+                zoom: 9,           // 直接使用zoom 9
+                minZoom: 9,
+                maxZoom: 9,
+                zoomControl: true,
+                attributionControl: false
+            });
+
+            log('✅ 地图对象创建成功', 'success');
+
+            // 尝试不同的瓦片路径
+            const tilePaths = [
+                '/9dixingtu/Google Terrain Maps without labels  roads and POI  512px/{x}/{y}.jpg',
+                '/9dixingtu/Google%20Terrain%20Maps%20without%20labels%20%20roads%20and%20POI%20%20512px/{x}/{y}.jpg'
+            ];
+
+            const selectedPath = tilePaths[0]; // 先试原始路径
+            log(`使用瓦片路径: ${selectedPath}`, 'info');
+
+            const tileLayer = L.tileLayer(selectedPath, {
+                tileSize: 512,     // 512px瓦片（相当于标准256px的zoom+1）
+                minNativeZoom: 9,  // 只有zoom 9的瓦片
+                maxNativeZoom: 9,
+                minZoom: 9,
+                maxZoom: 9
+            });
+
+            let loadCount = 0;
+            let errorCount = 0;
+
+            tileLayer.on('tileloadstart', (e) => {
+                log(`🔄 开始加载瓦片: ${e.tile.src}`, 'info');
+            });
+
+            tileLayer.on('tileload', (e) => {
+                loadCount++;
+                log(`✅ 瓦片加载成功 (#${loadCount}): ${e.tile.src}`, 'success');
+            });
+
+            tileLayer.on('tileerror', (e) => {
+                if (!e.tile.src.startsWith('data:')) {
+                    errorCount++;
+                    log(`❌ 瓦片加载失败 (#${errorCount}): ${e.tile.src}`, 'error');
+                }
+            });
+
+            tileLayer.addTo(map);
+            log('✅ 瓦片图层已添加到地图', 'success');
+
+            setTimeout(() => {
+                map.invalidateSize();
+                log(`📊 统计: ${loadCount} 成功, ${errorCount} 失败`, loadCount > 0 ? 'success' : 'error');
+            }, 2000);
+
+            map.on('click', (e) => {
+                log(`🖱️ 点击: [${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}]`, 'info');
+            });
+        }, 1000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+1. 核心接口定义 (TypeScript Interface)
+在你的代码中，你需要定义这几个基础类型。这就是给 DeepSeek 下指令时的“语法规则”。
+
+TypeScript
+
+// 定义所有支持的事件类型
+type EventType = 
+  | 'AVG_SET_BG'       // 1. 先背景
+  | 'AVG_PLAY_VOICE'   // 2. 然后旁白/配音
+  | 'AVG_SHOW_ACTOR'   // 3. 然后立绘
+  | 'MAP_SWITCH'       // 4. 切换地形图
+  | 'MAP_CAMERA'       // 5. 放大/运镜 (Zoom 9/10)
+  | 'MAP_UNIT_MARCH'   // 6. 行军 (SGZ10素材移动)
+  | 'MAP_BATTLE_FX'    // 7. 交战 (特效/整军)
+  | 'UI_SHOW_RESULT';  // 8. 结果结算
+
+// 每一个事件块的标准结构
+interface GameEvent {
+  id: string;          // 事件ID
+  type: EventType;     // 事件类型
+  params: any;         // 具体参数 (不同的类型参数不同)
+  next_delay?: number; // 执行完等待几秒进下一个
+}
+
+// 整个脚本就是一串事件列表
+interface EpisodeScript {
+  title: string;
+  events: GameEvent[];
+}
+2. 标准化流程演示 (JSON Payload)
+这是EP01 第一段在你的编辑器里最终长成的样子。DeepSeek 以后就是负责生成这个 JSON。
+
+流程： 背景 -> 旁白 -> 立绘 -> 切换 -> 运镜 -> 行军 -> 交战 -> 结果
+
+JSON
+
+{
+  "title": "EP01_帝业启动",
+  "events": [
+    {
+      // 1. 先背景
+      "type": "AVG_SET_BG",
+      "params": { "image": "bg_xianyang_palace_night.jpg", "fade_in": 1.0 }
+    },
+    {
+      // 3. 然后立绘 (先立绘再说话通常更自然，或者同时)
+      "type": "AVG_SHOW_ACTOR",
+      "params": { 
+        "actor_id": "LiSi", 
+        "pos": "center", 
+        "img": "actor_lisi_bow.png" 
+      }
+    },
+    {
+      // 2. 然后旁白 (配合字幕)
+      "type": "AVG_PLAY_VOICE",
+      "params": { 
+        "audio": "vo_ep01_01.mp3", 
+        "text": "大王，如今赵军主力北上攻燕，南部空虚，此乃天赐良机。",
+        "actor_name": "李斯"
+      }
+    },
+    {
+      // 4. 切换地形图
+      "type": "MAP_SWITCH",
+      "params": { 
+        "map_source": "china_gis_236bc.json", 
+        "transition": "cloud_dissolve" // 云雾散开转场
+      }
+    },
+    {
+      // 5. 放大/运镜 (Zoom 9 战略视角)
+      "type": "MAP_CAMERA",
+      "params": { 
+        "target": [36.5, 113.0], // 太行山/邺城中心点
+        "zoom": 9, 
+        "duration": 2.0 
+      }
+    },
+    {
+      // 6. 行军 (王翦出太行，桓齮渡漳水)
+      "type": "MAP_UNIT_MARCH",
+      "params": { 
+        "units": [
+          { "id": "u_wangjian", "sprite": "sgz10_cav_elite", "path": "path_taihang" },
+          { "id": "u_huanyi", "sprite": "sgz10_inf_mass", "path": "path_zhangriver" }
+        ]
+      }
+    },
+    {
+      // 7. 交战/整军 (Zoom 10 特写)
+      "type": "MAP_BATTLE_FX",
+      "params": { 
+        "loc": "Yecheng",
+        "effect": "army_merge_shine", // 兵权合并特效
+        "msg": "兵权合并：留精锐，遣杂兵"
+      },
+      "next_delay": 2.0
+    },
+    {
+      // 8. 结果
+      "type": "UI_SHOW_RESULT",
+      "params": { 
+        "stats": { "cities_captured": 9, "enemy_loss": 0 },
+        "text": "秦拔邺九城，赵都门户大开。"
+      }
+    }
+  ]
+}

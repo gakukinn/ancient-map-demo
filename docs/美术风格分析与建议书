@@ -1,0 +1,49 @@
+美术风格指南：传统工笔画 (Gongbi)
+这是为您定制的最终版美术风格指南。包含了人物和建筑两套专用的提示词公式。
+
+1. 游戏人物风格 (Game Character Style)
+关键点：侧视图 (Side View)，便于在地图上左右移动。强调轮廓清晰。
+
+通用公式 (直接复制)
+[角色身份] + [动作] + side view, profile view, facing right, Traditional Chinese Gongbi painting style, fine brushwork, clean dark outlines, flat colors, white background, 2D game sprite --ar 1:1
+
+常用兵种示例
+步兵 (Infantry): Chinese Qin dynasty infantry soldier, holding a long spear, walking, side view, profile view, facing right, Traditional Chinese Gongbi painting style, fine brushwork, clean dark outlines, distinct flat colors, white background, 2D game sprite --ar 1:1
+骑兵 (Cavalry): Chinese heavy cavalry riding a warhorse, holding a lance, side view, profile view, facing right, dynamic pose, Traditional Chinese Gongbi painting style, clean dark outlines, white background, 2D game sprite --ar 4:3
+弓兵 (Archer): Chinese ancient archer aiming bow, side view, profile view, facing right, Traditional Chinese Gongbi painting style, clean dark outlines, white background, 2D game sprite --ar 1:1
+2. 游戏建筑风格 (Game Building Style)
+关键点：等轴测视角 (Isometric View)，既有立体感又适合地图视角。
+
+通用公式 (直接复制)
+[建筑名称] + isometric view, 3d game asset, Traditional Chinese Gongbi painting style, fine brushwork, clean dark outlines, detailed roof tiles, white background, 2D game sprite --ar 1:1
+
+常用建筑示例
+主城/宫殿 (Grand City/Palace): Ancient Chinese palace city, high walls, grand gates, isometric view, 3d game asset, Traditional Chinese Gongbi painting style, detailed architecture, clean lines, white background, masterpiece --ar 1:1
+关隘/要塞 (Fortress/Pass): Ancient Chinese military fortress, stone walls, watchtower, isometric view, sturdy, Traditional Chinese Gongbi painting style, fine brushwork, white background, 2D game asset --ar 1:1
+村庄/农田 (Village/Farm): Small ancient Chinese village, simple houses, farmland, isometric view, peaceful, Traditional Chinese Gongbi painting style, clean lines, white background --ar 1:1
+3. 技术细节问答 (Technical FAQ)
+针对您刚才提出的专业问题，这里是解答：
+
+Q1: 人物不用45度角吗？(Why not 45°/Isometric for Characters?)
+不要用。
+
+原因：您的游戏代码 (
+LegionRenderer.ts
+) 是通过“水平翻转”来实现向左/向右移动的。
+如果是45度角的人物，向右看是“东南方”，一翻转就变成了“西南方”，在地图上移动时会看起来像是在“斜着溜冰”，非常违和。
+只有纯侧面 (Side View)，翻转后依然是“纯侧面”，完全适配您的代码。
+Q2: 建筑需要45度角吗？
+要用。
+
+建筑不会动，45度 (Isometric) 能展现立体感和透视，是战略地图的标配。
+Q3: 要用描黑吗？(Outline)
+必须用。
+
+Prompt关键词: clean dark outlines (清晰深色轮廓) / black outline
+原因：工笔画本身的特点就是“勾线填色”。在缩小的游戏地图上，如果没有黑线描边，角色会和背景混在一起，看不清楚。
+Q4: 要用脚下阴影吗？(Drop Shadow)
+最好不要由AI生成。
+
+Prompt关键词: white background (白底)
+原因：AI生成的阴影通常方向不对，或者很难抠图。
+建议：生成无阴影的图，然后在游戏中用代码画一个小椭圆在脚下作为阴影，这样最统一、最干净。

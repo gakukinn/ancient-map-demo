@@ -1,0 +1,1818 @@
+﻿html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+    background: #1a1a1a;
+    /* Dark background while loading */
+}
+
+.hud {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+    /* Above map */
+    pointer-events: none;
+    /* Let clicks pass through to map */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.hud.ui-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+/* UI Toggle Button in HUD */
+.ui-toggle-btn-hud {
+    /* width: 100%; REMOVED for narrower look */
+    width: auto;
+    min-width: 100px;
+    /* Minimum clickable width */
+    padding: 8px 12px;
+    /* Slightly reduced padding */
+    background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%);
+    color: white;
+    border: 2px solid #818cf8;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(67, 56, 202, 0.3);
+}
+
+.ui-toggle-btn-hud:hover {
+    background: linear-gradient(135deg, #3730a3 0%, #4f46e5 100%);
+    border-color: #a5b4fc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 56, 202, 0.5);
+}
+
+.ui-toggle-btn-hud:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(67, 56, 202, 0.4);
+}
+
+/* Info Panel - Enable interactions */
+.info-panel {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    pointer-events: auto;
+    /* Re-enable clicks for panel */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-bottom: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.info-row .label {
+    color: #aaa;
+    margin-right: 10px;
+}
+
+.info-row .value {
+    color: #fff;
+    font-weight: bold;
+}
+
+.control-row {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+
+.hud-content {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    pointer-events: auto;
+    /* Re-enable clicks for HUD */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.hud-title {
+    margin: 0 0 10px 0;
+    font-size: 24px;
+    color: #ffd700;
+    /* Gold */
+}
+
+.controls button {
+    background: #333;
+    color: white;
+    border: 1px solid #555;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.controls button:hover {
+    background: #555;
+}
+
+.speed-btn {
+    font-size: 12px;
+    padding: 4px 8px;
+    min-width: 40px;
+}
+
+.speed-btn.active {
+    background: #22C55E;
+    border-color: #16A34A;
+    color: white;
+    font-weight: bold;
+}
+
+/* City Labels */
+.city-label {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #ffd700;
+    /* Gold text */
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 2px 2px 2px black;
+}
+
+/* Player Info Panel */
+.player-info {
+    color: #ffd700;
+    /* Gold */
+}
+
+.player-stats {
+    font-size: 13px;
+}
+
+.stat-row {
+    margin-bottom: 5px;
+    display: flex;
+    padding: 8px;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.editor-panel {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1100;
+    /* Above HUD (1000) */
+    pointer-events: none; /* Default no interaction for container */
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+#editor-controls {
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid #444;
+    border-radius: 8px;
+    padding: 10px;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    pointer-events: auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    margin-top: 10px;
+}
+
+.editor-panel.ui-hidden {
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+}
+
+.editor-toggle-btn:hover {
+    background: #555;
+    border-color: #888;
+}
+
+.editor-toggle-btn.active {
+    background: #EF4444;
+    border-color: #F87171;
+}
+
+.tool-group {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.tool-group:last-of-type {
+    border-bottom: none;
+}
+
+.tool-group-title {
+    font-size: 12px;
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.tool-buttons {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.tool-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 6px 8px;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover:not(:disabled) {
+    background: #555;
+    border-color: #888;
+    transform: translateY(-1px);
+}
+
+.tool-btn.active {
+    background: #3B82F6;
+    border-color: #60A5FA;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.tool-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tool-btn-full {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.tool-btn-full:hover {
+    background: #555;
+    transform: translateY(-1px);
+}
+
+.tool-btn-full.danger {
+    background: #991B1B;
+    border-color: #DC2626;
+}
+
+.tool-btn-full.danger:hover {
+    background: #B91C1C;
+}
+
+.editor-status {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.status-row:last-child {
+    margin-bottom: 0;
+}
+
+.status-label {
+    color: #AAA;
+}
+
+.status-value {
+    color: #22C55E;
+    font-weight: bold;
+}
+
+.editor-tips {
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+/* Event Notifications */
+#notification-area {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2000;
+    width: 300px;
+    pointer-events: none;
+}
+
+.event-notification {
+    background: rgba(0, 0, 0, 0.8);
+    border-left: 4px solid #ffd700;
+    padding: 15px;
+    margin-bottom: 10px;
+    color: white;
+    border-radius: 4px;
+    animation: slideIn 0.5s ease-out;
+    pointer-events: auto;
+}
+
+.event-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
+.event-desc {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Army Icon */
+.army-icon {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Event Display Panel */
+.event-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1500;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 8px;
+    padding: 15px;
+    min-width: 300px;
+    max-width: 400px;
+    color: white;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.event-panel.ui-hidden {
+    opacity: 0;
+    transform: translateX(-20px);
+    pointer-events: none;
+}
+
+.event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.event-header button {
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover:not(:disabled) {
+    background: #555;
+    border-color: #888;
+    transform: translateY(-1px);
+}
+
+.tool-btn.active {
+    background: #3B82F6;
+    border-color: #60A5FA;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.tool-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.tool-btn-full {
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px;
+    background: #444;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.tool-btn-full:hover {
+    background: #555;
+    transform: translateY(-1px);
+}
+
+.tool-btn-full.danger {
+    background: #991B1B;
+    border-color: #DC2626;
+}
+
+.tool-btn-full.danger:hover {
+    background: #B91C1C;
+}
+
+.editor-status {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 8px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 11px;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.status-row:last-child {
+    margin-bottom: 0;
+}
+
+.status-label {
+    color: #AAA;
+}
+
+.status-value {
+    color: #22C55E;
+    font-weight: bold;
+}
+
+.editor-tips {
+    font-size: 11px;
+    color: #888;
+    text-align: center;
+    padding: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+/* Event Notifications */
+#notification-area {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 2000;
+    width: 300px;
+    pointer-events: none;
+}
+
+.event-notification {
+    background: rgba(0, 0, 0, 0.8);
+    border-left: 4px solid #ffd700;
+    padding: 15px;
+    margin-bottom: 10px;
+    color: white;
+    border-radius: 4px;
+    animation: slideIn 0.5s ease-out;
+    pointer-events: auto;
+}
+
+.event-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffd700;
+    margin-bottom: 5px;
+}
+
+.event-desc {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Army Icon */
+.army-icon {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Event Display Panel */
+.event-panel {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1500;
+    background: rgba(0, 0, 0, 0.85);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 8px;
+    padding: 15px;
+    min-width: 300px;
+    max-width: 400px;
+    color: white;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+
+/* Player Sprite Styles */
+.player-marker-container {
+    background: transparent;
+    border: none;
+}
+
+.player-sprite {
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/qinbuzhengyi.png');
+    background-size: 500% 200%;
+    /* 5x2 grid */
+    background-position: 100% 100%;
+    /* Show frame 9 (standing) */
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+}
+
+/* Mirrored City Image - Use scale property to avoid transform conflict */
+.mirrored-city {
+    scale: -1 1;
+}
+
+/* NPC Hitbox - Hide borders */
+.npc-hitbox {
+    stroke: none !important;
+    fill: rgba(0, 0, 0, 0) !important;
+    fill-opacity: 0 !important;
+    outline: none !important;
+}
+
+path.npc-hitbox {
+    stroke: none !important;
+    fill: rgba(0, 0, 0, 0) !important;
+    fill-opacity: 0 !important;
+}
+
+#event-content {
+    white-space: nowrap;
+}
+
+.event-panel.expanded {
+    min-width: 400px;
+    max-width: 600px;
+    height: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.event-panel.expanded #event-content {
+    white-space: normal;
+    margin-top: 10px;
+}
+
+.event-item {
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9em;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+/* ========================================
+   野战特效 - Field Battle Effects
+   ======================================== */
+.field-battle-effect {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 交叉刀剑 */
+.battle-swords {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    animation: swordClash 0.3s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 100, 50, 0.8));
+    z-index: 10;
+}
+
+@keyframes swordClash {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+}
+
+/* 冲击波环 */
+.battle-shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    border: 3px solid rgba(255, 200, 100, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    animation: shockwaveExpand 1s ease-out infinite;
+}
+
+.battle-shockwave:nth-child(2) {
+    animation-delay: 0.33s;
+}
+
+/* [NEW] GIF Battle Effect */
+.battle-effect-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    mix-blend-mode: screen;
+    /* 关键：滤色模式去除黑色背景 */
+    pointer-events: none;
+    filter: brightness(1.2) contrast(1.1);
+    /* 稍微增强亮度 */
+}
+
+.battle-shockwave:nth-child(3) {
+    animation-delay: 0.66s;
+}
+
+@keyframes shockwaveExpand {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 0.8;
+        border-width: 4px;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+        border-width: 1px;
+    }
+}
+
+/* 火花/烟尘粒子 */
+.battle-spark {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: radial-gradient(circle, #ffdd55 0%, #ff6600 50%, transparent 100%);
+    border-radius: 50%;
+    animation: sparkBurst 0.6s ease-out infinite;
+}
+
+.battle-spark:nth-child(4) {
+    top: 30%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.battle-spark:nth-child(5) {
+    top: 20%;
+    left: 60%;
+    animation-delay: 0.1s;
+}
+
+.battle-spark:nth-child(6) {
+    top: 70%;
+    left: 30%;
+    animation-delay: 0.2s;
+}
+
+.battle-spark:nth-child(7) {
+    top: 60%;
+    left: 70%;
+    animation-delay: 0.15s;
+}
+
+.battle-spark:nth-child(8) {
+    top: 40%;
+    left: 80%;
+    animation-delay: 0.25s;
+}
+
+.battle-spark:nth-child(9) {
+    top: 80%;
+    left: 50%;
+    animation-delay: 0.05s;
+}
+
+.battle-spark:nth-child(10) {
+    top: 25%;
+    left: 40%;
+    animation-delay: 0.3s;
+}
+
+.battle-spark:nth-child(11) {
+    top: 55%;
+    left: 15%;
+    animation-delay: 0.12s;
+}
+
+@keyframes city-siege-pulse {
+    0% {
+        filter: brightness(1) drop-shadow(0 0 0 transparent);
+        transform: scale(1);
+    }
+
+    50% {
+        filter: brightness(1.3) sepia(1) hue-rotate(-50deg) saturate(3) drop-shadow(0 0 15px rgba(255, 69, 0, 0.8));
+        transform: scale(1.05);
+    }
+
+    100% {
+        filter: brightness(1) drop-shadow(0 0 0 transparent);
+        transform: scale(1);
+    }
+}
+
+.city-under-siege img {
+    animation: city-siege-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes sparkBurst {
+    0% {
+        transform: scale(0) translate(0, 0);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.5) translate(var(--spark-x, 10px), var(--spark-y, -15px));
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(0.5) translate(calc(var(--spark-x, 10px) * 2), calc(var(--spark-y, -15px) * 2));
+        opacity: 0;
+    }
+}
+
+/* 烟尘云 */
+.battle-dust {
+    position: absolute;
+    width: 30px;
+    height: 20px;
+    background: radial-gradient(ellipse, rgba(139, 119, 101, 0.6) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: dustFloat 1.5s ease-in-out infinite;
+}
+
+.battle-dust:nth-child(12) {
+    bottom: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.battle-dust:nth-child(13) {
+    bottom: 5%;
+    left: 50%;
+    animation-delay: 0.3s;
+}
+
+.battle-dust:nth-child(14) {
+    bottom: 15%;
+    right: 15%;
+    animation-delay: 0.6s;
+}
+
+.battle-dust:nth-child(15) {
+    bottom: 8%;
+    left: 30%;
+    animation-delay: 0.9s;
+}
+
+@keyframes dustFloat {
+    0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-25px) scale(1.3);
+        opacity: 0;
+    }
+}
+
+/* 整体动画闪烁 */
+.field-battle-effect::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(255, 150, 50, 0.3) 0%, transparent 60%);
+    animation: battleGlow 0.5s ease-in-out infinite alternate;
+    z-index: 0;
+}
+
+@keyframes battleGlow {
+    0% {
+        opacity: 0.3;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+
+    100% {
+        opacity: 0.7;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Road Textures */
+.road-texture img {
+    transform-origin: center center;
+}
+
+.road-rotate-0 img {
+    transform: rotate(0deg);
+}
+
+.road-rotate-60 img {
+    transform: rotate(60deg);
+}
+
+.road-rotate--60 img {
+    transform: rotate(-60deg);
+}
+
+.road-rotate-120 img {
+    transform: rotate(120deg);
+}
+
+/* Territory Pane (Global Blur & Opacity) */
+.leaflet-territory-pane {
+    opacity: 0.6;
+    /* Blur removed as per user request */
+    transition: all 0.5s ease;
+    pointer-events: none;
+}
+
+/* 
+   We remove the per-polygon blur to avoid internal seams.
+   The polygons themselves should be solid (opacity 1) inside this pane.
+*/
+.territory-hex-polygon {
+    /* No blur here - intentionally minimal styling */
+    pointer-events: none;
+}
+
+/* ========================================
+   城市基座过渡 - City Base Transition
+   ======================================== */
+.city-foundation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #4a3424;
+    /* Dark Mud/Earth color */
+    z-index: -1;
+    /* Behind the city image */
+    filter: blur(2px) contrast(1.2);
+    /* Soften edges slightly */
+    box-shadow: inset 0 0 20px #2d1e15, 0 0 10px rgba(45, 30, 21, 0.8);
+    opacity: 0.9;
+    pointer-events: none;
+    border: 1px dashed rgba(80, 60, 40, 0.3);
+    /* Add some internal noise */
+}
+
+/* Texture overlay for the foundation to give it "grit" */
+.city-foundation::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPgo8cmVjdCB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iMC4xIi8+Cjwvc3ZnPg==');
+    /* Subtle noise pattern */
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    border-radius: inherit;
+}
+
+/* ========================================
+   城市基座过渡 - City Base Transition (Refined)
+   ======================================== */
+.city-foundation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* RGB(100, 70, 50) -> #644632 */
+    background-color: rgba(100, 70, 50, 0.85);
+    z-index: -1;
+    pointer-events: none;
+    /* Use a noise textural border or outline to make edges jagged */
+    /* Minimal blur, we want 'grit' not 'shadow' */
+    filter: blur(0.5px);
+}
+
+/* Common style for the jagged sub-layers */
+.city-foundation-layer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(100, 70, 50, 0.7);
+    z-index: -1;
+    pointer-events: none;
+    border: 1px dashed rgba(60, 40, 30, 0.5);
+    /* Dashed border creates "noise" at edge */
+}
+
+/* Texture overlay for the foundation to give it "farmland/mud" look */
+.city-foundation::after,
+.city-foundation-layer::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    /* Strong noise pattern */
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDUiLz4KPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIwLjIiLz4KPHJlY3QgeD0iNCIgeT0iNCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iIzAwMCIgZmlsbC1vcGFjaXR5PSIwLjIiLz4KPC9zdmc+');
+    opacity: 0.6;
+    mix-blend-mode: overlay;
+    border-radius: inherit;
+}
+
+/* ========================================
+   城市旗帜动画 - City Flag Animation
+   ======================================== */
+/* 4帧精灵图动画，每帧150ms, 匹配军队旗帜 (4 frames x 150ms = 600ms total) */
+/* Frame width after scale (1.4): 32 * 1.4 = 44.8px */
+@keyframes cityFlagWave {
+
+    0%,
+    100% {
+        background-position-x: 0px;
+    }
+
+    25% {
+        background-position-x: -44.8px;
+    }
+
+    50% {
+        background-position-x: -89.6px;
+    }
+
+    75% {
+        background-position-x: -134.4px;
+    }
+}
+
+.city-flag-body {
+    animation: cityFlagWave 0.6s steps(1) infinite;
+}
+
+/* ========================================
+   Unified Editor Sidebar
+   ======================================== */
+.main-editor-toggle {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    padding: 12px 24px;
+    background: #FF5722;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10001;
+    /* Above almost everything */
+    transition: all 0.2s ease;
+}
+
+.main-editor-toggle:hover {
+    transform: scale(1.05);
+    background: #F4511E;
+}
+
+.editor-sidebar {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 350px;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    z-index: 10002;
+    display: flex;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Tabs column */
+.editor-tabs {
+    width: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.editor-tab {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 15px;
+    border: none;
+    background: transparent;
+    color: #666;
+    font-size: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.editor-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.editor-tab.active {
+    background: #FF5722;
+    color: white;
+    box-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+}
+
+/* Content Area */
+.editor-content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.editor-header {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+#editor-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+.editor-tab-content {
+    display: none;
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.editor-tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Reuse existing tool-btn styles but adapt for sidebar */
+.tool-btn-full {
+    width: 100%;
+    padding: 10px;
+    background: #333;
+    border: 1px solid #444;
+    color: #eee;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.tool-btn-full:hover {
+    background: #444;
+    border-color: #666;
+}
+
+.tool-hint {
+    color: #888;
+    font-size: 12px;
+    margin-top: 5px;
+    text-align: center;
+}
+
+/* ========================================
+   Chronicle UI - Silent Chronicle Mode (Parchment/Ink Style)
+   ======================================== */
+#chronicle-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 450px;
+
+    /* Parchment Gradient: Warm Beige fading into map */
+    /* Increased transparency (lower alpha) and richer parchment tone */
+    background: linear-gradient(to right,
+            rgba(235, 222, 190, 0.85) 0%,
+            /* Richer Parchment, More Transparent */
+            rgba(235, 222, 190, 0.5) 50%,
+            /* Fades out sooner */
+            rgba(235, 222, 190, 0) 100%);
+
+    z-index: 900;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
+
+    /* Typography: Serif for historical feel */
+    font-family: 'SimSun', 'Songti SC', 'Noto Serif SC', serif;
+}
+
+#chronicle-overlay.ui-hidden {
+    transform: translateX(-100%);
+    opacity: 0;
+}
+
+.chronicle-header {
+    display: none;
+    /* Hide - year is already shown in year groups */
+}
+
+.chronicle-year {
+    font-size: 48px;
+    font-weight: 900;
+
+    /* Ink / Cinnabar Style */
+    color: #3e2b1d;
+    /* Dark Brown Ink */
+    /* Alternative: #8B0000 (Dark Red Stamp) if preferred, but user said Ink/Dark Brown */
+
+    text-shadow: 2px 2px 0px rgba(200, 190, 170, 0.5);
+    /* Subtle emboss on paper */
+    padding-bottom: 5px;
+    letter-spacing: 2px;
+    border-bottom: 3px double #3e2b1d;
+    /* Classical double underline */
+    display: inline-block;
+}
+
+.chronicle-events-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 20px;
+    padding-left: 5px;
+    pointer-events: auto;
+
+    /* Fade out bottom */
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+
+    scrollbar-width: none;
+}
+
+.chronicle-events-list::-webkit-scrollbar {
+    display: none;
+}
+
+.chronicle-item {
+    margin-bottom: 30px;
+    opacity: 0.7;
+    transition: all 0.5s ease;
+
+    /* Ink Vertical Line */
+    border-left: 2px solid rgba(62, 43, 29, 0.2);
+    padding-left: 20px;
+    transform-origin: left center;
+}
+
+.chronicle-item:hover {
+    opacity: 1;
+    background: linear-gradient(to right, rgba(62, 43, 29, 0.05), transparent);
+    border-left-color: #3e2b1d;
+}
+
+/* Newest Item */
+.chronicle-events-list .chronicle-item:first-child {
+    opacity: 1;
+    border-left: 4px solid #8B0000;
+    /* Red emphasis (Cinnabar) for current event */
+    padding-left: 25px;
+    margin-bottom: 40px;
+}
+
+.chronicle-item.new-item {
+    transform: translateX(-30px);
+    opacity: 0;
+}
+
+.chronicle-item.visible {
+    transform: translateX(0);
+}
+
+.chronicle-meta {
+    font-size: 14px;
+    color: #5c4a3d;
+    /* Lighter brown */
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.season-badge {
+    /* Stamp style for season */
+    border: 1px solid #5c4a3d;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 12px;
+}
+
+/* Removed: .chronicle-events-list .chronicle-item:first-child .season-badge
+   This rule conflicted with .current styling, causing red text on red background */
+
+.chronicle-content {
+    font-size: 22px;
+    color: #2c1e14;
+    line-height: 1.7;
+    font-weight: 600;
+    font-family: 'Kaiti SC', 'KaiTi', serif;
+}
+
+.chronicle-keyword {
+    color: #8B0000;
+    /* Red keyword */
+    border-bottom: 1px dashed rgba(139, 0, 0, 0.4);
+}
+
+/* ========================================
+   Chronicle UI - Year Groups
+   ======================================== */
+.chronicle-year-group {
+    margin-bottom: 20px;
+}
+
+.year-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(62, 43, 29, 0.15);
+    border-left: 3px solid #5c4a3d;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0 4px 4px 0;
+}
+
+.year-header:hover {
+    background: rgba(62, 43, 29, 0.25);
+}
+
+.year-marker {
+    font-size: 20px;
+    font-weight: bold;
+    color: #3e2b1d;
+    font-family: 'SimSun', 'Songti SC', serif;
+}
+
+.year-toggle {
+    font-size: 12px;
+    color: #5c4a3d;
+    transition: transform 0.3s ease;
+}
+
+.year-events {
+    padding-left: 15px;
+    border-left: 2px solid rgba(62, 43, 29, 0.1);
+    margin-left: 5px;
+    max-height: 1000px;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.chronicle-year-group.collapsed .year-events {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+/* Current Year Highlight */
+.chronicle-year-group.current-year .year-header {
+    background: rgba(139, 0, 0, 0.15);
+    border-left-color: #8B0000;
+}
+
+.chronicle-year-group.current-year .year-marker {
+    color: #8B0000;
+}
+
+/* Past Year Dim */
+.chronicle-year-group.past-year .year-header {
+    opacity: 0.6;
+}
+
+/* Future Year */
+.chronicle-year-group.future-year .year-header {
+    opacity: 0.8;
+}
+
+/* ========================================
+   Chronicle UI - Event States
+   ======================================== */
+.chronicle-item.past {
+    opacity: 0.5;
+    border-left-color: rgba(62, 43, 29, 0.1);
+}
+
+.chronicle-item.current {
+    opacity: 1;
+    border-left: 6px solid #8B0000;
+    background: linear-gradient(to right, rgba(139, 0, 0, 0.2), rgba(139, 0, 0, 0.05));
+    padding: 15px 15px 15px 25px;
+    margin: 20px 0;
+    animation: chronicle-pulse 1.5s ease-in-out infinite;
+    transform: scale(1.05);
+    transform-origin: left center;
+    border-radius: 0 8px 8px 0;
+    box-shadow: 0 4px 20px rgba(139, 0, 0, 0.3);
+}
+
+.chronicle-item.current .chronicle-content {
+    font-size: 28px;
+    font-weight: 800;
+    color: #000;
+    text-shadow: 2px 2px 4px rgba(139, 0, 0, 0.3);
+    line-height: 1.5;
+}
+
+.chronicle-item.current .season-badge {
+    color: #fff;
+    background: #8B0000;
+    border-color: #8B0000;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 4px;
+
+    /* [FIX] Ensure text is centered and visible */
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 24px;
+    line-height: 1;
+}
+
+.chronicle-item.current .type-icon {
+    font-size: 20px;
+}
+
+@keyframes chronicle-pulse {
+
+    0%,
+    100% {
+        background: rgba(139, 0, 0, 0.08);
+    }
+
+    50% {
+        background: rgba(139, 0, 0, 0.15);
+    }
+}
+
+.chronicle-item.future {
+    opacity: 0.9;
+}
+
+/* Type Icons */
+.type-icon {
+    font-size: 14px;
+    margin-left: 8px;
+}
+
+/* Faction Status Panel */
+.faction-status-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 280px;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+    z-index: 2000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-height: 500px;
+    /* Limit height */
+    display: flex;
+    flex-direction: column;
+}
+
+.faction-status-panel.collapsed {
+    width: auto;
+    height: auto;
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.faction-status-panel.collapsed .faction-status-content {
+    display: none;
+}
+
+.faction-status-panel.collapsed .fs-title {
+    display: none;
+}
+
+.faction-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.faction-status-panel.collapsed .faction-status-header {
+    border-bottom: none;
+    padding: 6px;
+    background: transparent;
+}
+
+.fs-title {
+    font-weight: bold;
+    color: #ffd700;
+    font-size: 14px;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.faction-status-toggle {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.faction-status-toggle:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.faction-status-content {
+    padding: 0;
+    overflow-y: auto;
+    /* Custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.fs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.fs-table th {
+    text-align: left;
+    padding: 8px 12px;
+    color: #888;
+    font-weight: normal;
+    background: rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+}
+
+.fs-table td {
+    padding: 6px 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fs-row:last-child td {
+    border-bottom: none;
+}
+
+.fs-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fs-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+}
+
+.fs-color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    box-shadow: 0 0 5px currentColor;
+}
+
+.fs-troops {
+    color: #4ade80;
+    /* Green-400 */
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.fs-legion {
+    color: #f87171;
+    /* Red-400 */
+}
+
+.fs-legion-val {
+    font-weight: bold;
+}
+
+.fs-status {
+    font-size: 10px;
+    margin-left: 4px;
+}
+
+.fs-idle {
+    color: #555;
+    font-size: 10px;
+    font-style: italic;
+}
+
+
+/* Faction Status Clickable Rows */
+.fs-row.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.fs-row.clickable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Faction Status Panel Styles */
+.faction-status-panel {
+    position: fixed;
+    left: 20px;       /* [FIX] Move to Left */
+    bottom: 20px;     /* [FIX] Move to Bottom */
+    right: auto;      /* Reset Right */
+    top: auto;        /* Reset Top */
+    /* Below Notification Area - Not needed anymore */
+    z-index: 2000;
+    /* [FIX] Higher than all map layers */
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    width: 280px;
+    /* Fixed width */
+    pointer-events: auto;
+    /* [FIX] Ensure interactive */
+    max-height: 60vh; /* Dynamic max height based on viewport */
+    display: flex;
+    flex-direction: column;
+}
+
+.faction-status-panel.collapsed {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    left: 20px;       /* [FIX] Keep at Left */
+    bottom: 20px;     /* [FIX] Keep at Bottom */
+    right: auto;
+    top: auto;
+}
+
+.faction-status-header {
+    background: linear-gradient(to right, #2c3e50, #4ca1af);
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.faction-status-toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.faction-status-content {
+    background: rgba(0, 0, 0, 0.85);
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.fs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.fs-table th {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #555;
+    color: #ccc;
+    position: sticky;
+    top: 0;
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.fs-row {
+    border-bottom: 1px solid #333;
+    transition: background 0.2s;
+}
+
+.fs-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fs-row.clickable {
+    cursor: pointer;
+}
+
+.fs-name {
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+}
+
+.fs-color-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.fs-troops {
+    padding: 8px;
+    color: #ffd700;
+    font-family: monospace;
+}
+
+.fs-legion {
+    padding: 8px;
+}
+
+.fs-legion-val {
+    color: #aaf;
+}
+
+.fs-status {
+    font-size: 10px;
+}
+
+.fs-idle {
+    color: #666;
+    font-style: italic;
+}
+
+.fs-empty {
+    color: #444;
+    text-align: center;
+    display: block;
+}
+
+/* [FIX] Follow Radio Styles */
+.fs-action {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0 4px;
+}
+
+.follow-radio {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    accent-color: #ffd700;
+    /* Gold color */
+    pointer-events: auto;
+    /* Double check interaction */
+}
+
+/* Hide content when collapsed */
+.faction-status-panel.collapsed .faction-status-content,
+.faction-status-panel.collapsed .fs-title {
+    display: none;
+}
+
+.faction-status-panel.collapsed .faction-status-header {
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    background: #444;
+    border-radius: 50%;
+}

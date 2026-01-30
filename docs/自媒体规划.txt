@@ -1,0 +1,149 @@
+【Project Qin】秦汉战争地缘大推演 · 单兵执行手册 (The Operations Manual)
+
+> [!IMPORTANT] 核心原则 (Core Doctrine)
+> **风格对标**：**The Operations Room**
+> **核心价值**：**硬核可视化 (Hardcore Visualization)** + **制度史深度 (Systemic Depth)**
+> **叙事禁区**：禁止角色扮演 (No Roleplay)。禁止泛泛而谈。
+> **制作模式**：**异步导演模式 (Asynchronous Director Mode)**。一人军队，不直播，全后期。
+
+---
+
+## 第一部分：双核资源映射 (The Dual-Core Protocol)
+
+我们的每一个视频都在同时讲两个故事：一个是**“看得到的箭头”**，一个是**“看不到的制度”**。
+
+### 1. 骨架层 (The Skeleton) —— 负责“动”
+*   **核心依据**：**Book A《中国历代战争史》（台湾三军大学）**
+*   **提取内容**：行军路线、地形关隘、兵力数据、时间节点。
+*   **引擎映射**：直接对应 MAPWAR 引擎的 `move_path`、`spawn_unit`、`camera_target`。
+*   **表现形式**：卫星地图上的红蓝箭头推演。
+
+### 2. 血肉层 (The Flesh) —— 负责“深”
+*   **核心依据**：**Book B《战国军事史》（军事通史）**
+*   **提取内容**：后勤制度、兵役动员、武器代差、地理极限。
+*   **引擎映射**：对应 MAPWAR 引擎的 `Knowledge_Popup` (知识弹窗) 或 `System_Overlay` (制度图层)。
+*   **表现形式**：当箭头移动时，旁白解释“为什么”它能移动这么快（例如：引用秦的粮仓分布图）。
+
+---
+
+## 第二部分：30秒黄金开场法则 (The 30-Second Hook)
+
+算法没有耐心。前30秒必须完成“视觉冲击”和“认知颠覆”。
+
+### 结构模型：
+| 时间段 | 模块 | 核心任务 | 表现形式 |
+| :--- | :--- | :--- | :--- |
+| **00:00 - 00:15** | **视觉暴击 (The Visual Shock)** | 让观众瞳孔地震，随即抛出反常识暴论。 | 1. 全图变色警报 (Red Alert)。<br>2. 暴论：“教科书讲错了”。 |
+| **00:15 - 00:30** | **认知缺口 (The Gap)** | 用地图展示不合理的现象，制造悬念。 | “赵军主力在北，秦军为什么敢走‘死地’？” |
+| **00:30 - 01:00** | **战情速报 (The Context)** | 快速同步时间、地点、兵力。 | 标题卡轰入 + 卫星地图快速扫描战区。 |
+
+**执行范例 (EP01)**：
+> 画面：卫星地图显示赵国主力（红色）正在北上攻打燕国，而其南部边境（邯郸-邺城）一片空虚。
+> 旁白：“公元前236年，赵国为了攻占燕国的几座城池，将主力大军全部调往北方。这一决策导致其南部防线出现了长达300公里的致命真空。秦军统帅王翦立刻抓住了这个稍纵即逝的窗口。”
+
+---
+
+## 第三部分：标准推演流程
+
+除此之外的时间，严格遵循 **Operations Room** 风格的冷静推演。
+
+### 1. 叙事口吻 (Narrative Voice)
+*   **上帝视角**：你是来自未来的战史观察员，不是说书人。
+*   **去情感化**：多用军事术语（侧翼迂回、钳形攻势、补给线切断），少用形容词（惨烈、悲壮）。
+*   **数据驱动**：“秦军行进速度为每日30公里”，而不是“秦军神速”。
+
+### 2. 视觉逻辑 (Visual Logic)
+*   **地图是主角**：90% 的时间画面必须是 GIS 地图。
+*   **拒绝大头照**：不要出现主播的脸，也不要出现大段立绘对话。
+*   **制度插件**：每隔3-5分钟，插入一个“Explanatory Diagram”（解析图），解释Book B中的知识点（如：秦弩射程对比）。
+
+---
+
+---
+
+## 第四部分：AI 工业化执行协议 (AI Execution Protocol)
+
+> **原则**：机器做机器擅长的事，人做人擅长的事。
+> **时长策略**：
+> *   **开场 (The Hook)**：严格锁定 **30秒**。
+> *   **正文 (The Body)**：**弹性时长**。根据史料（Book A）的丰富程度决定。如果一场仗史料只有500字，视频就做5分钟；如果有5000字，就做20分钟。不要注水。
+
+### 黄金流水线 (The Golden Pipeline) —— [Standard v2.0]
+
+我们已将生产流程“反恐精英化”，拆解为雷打不动的三个核心步骤。每一集都必须严格遵循此SOP。
+
+#### Step 1: 挖矿 (Data Mining) —— [Role: 史料考据官]
+*   **Prompt**: `Step1_Database_ETL.md` (ETL Protocol v3.0)
+*   **任务**: 从《资治通鉴》、《中国历代战争史》等源码中提取“高精度时空数据”。
+*   **核心产出**: `step1_database.md` (Markdown表格)。
+*   **标准**:
+    *   **地理对撞**: 只要跨越黄河/太行，必须有渡口/隘口坐标。
+    *   **严禁脑补**: 每一行必须要有 `Source_Quote` 原文佐证。
+    *   **兵力估算**: 严禁 N/A。
+
+    C:\Users\GAKU\Desktop\MAPWAR\prompts\Step1_Database_ETL.md
+
+#### Step 2A: 编剧 (Scriptwriting) —— [Role: 战情室导演]
+*   **Prompt**: `Step2A_Director_Script.md` (Operations Room Style)
+*   **任务**: 将 Step 1 的冷数据翻译为“战情室风格”的解说文案。
+*   **核心产出**: `epXX_narrative.md` (纯文本)。
+*   **标准**:
+    *   **SITREP 风格**: 使用“态势感知”、“侧翼迂回”、“战略真空”等专业术语。
+    *   **Present Tense**: 使用现在进行时（如“秦军正在渡河”）。
+    *   **音画同步**: 每一个解说点必须对应一个画面焦点。
+
+    C:\Users\GAKU\Desktop\MAPWAR\prompts\Step2A_Director_Script.md
+
+请改写：    The Operations Room自媒体风格，去除现代化和西化表述，统一转为古雅汉语军事语境：强化冷峻客观的战史叙述口吻，减少主观渲染。对关键战术和地形描述做了凝练，突出古代兵家所述的扼要之感。确保关键名词绝对清晰：所有核心地名（如邯郸、阏与、邺城）平衡古典语感与易懂性：整体保持史书叙事的简练与冷峻，但句式更直白，避免过度简略或生僻典故，确保现代观众一听即懂。强化逻辑与画面感：在清晰的基础上，保留并优化了如“拦腰切断”、“南北夹击”等形象比喻，以增强解说张力。
+
+#### Step 2B: 施工 (Coding) —— [Role: 全栈工程师]
+*   **Prompt**: `Step2B_Engine_Coder.md` (JSON Generator)
+*   **任务**: 将 Step 2A 的文案封装进引擎可执行的 JSON 代码中。
+*   **核心产出**: `script.json` (TypeScript Interface Compliant)。
+*   **标准**:
+    *   **Type Safety**: 严格遵守 `ScenarioScript` 接口定义。
+    *   **Assets Mapping**: 自动映射最新的 asset paths。
+
+#### Step 3: 后期 (Production) —— [Role: 人类导演]
+*   **操作**:
+    1. 将 `script.json` 放入 `juji/EPxx/` 目录。
+    2. 启动引擎，使用 OBS 录制 4K 画面。
+    3. 使用 TTS 生成旁白，与画面对齐。
+
+### 步骤 6：导演录制 (Capture) —— [人: Human + OBS]
+*   **任务**：录制 4K 视频流。
+*   **操作**：
+    *   (引擎) 点击“Auto Play”。
+    *   (人) 使用 OBS 录制高码率视频。**注意**：此时你就是导演，要盯着监视器确认演出无误。
+
+### 步骤 7：后期注入 (Post) —— [人: CapCut/Premiere + AI Voice]
+*   **任务**：声音与画面的结合。
+*   **操作**：
+    *   (AI) 使用 ElevenLabs / 剪映 生成旁白语音（推荐：深沉男声）。
+    *   (人) 将语音与视频轨对齐。
+    *   (人) 添加背景音效（低沉的 Drone 氛围音 + 战场兵戈声）。
+
+---
+
+## 第五部分：AI 指令集概览 (Standardized Prompts)
+
+为了确保 DeepSeek 写出 **Operations Room** 风格的脚本，请使用以下指令结构：
+
+> **[Role]**: You are a military analyst recounting historical operations. Top-down view. Cold. Precise.
+> **[Constraint]**:
+> 1. NO dialogue. NO "General A said".
+> 2. Focus on movement vectors and logistics.
+> 3. Visual descriptions must map to GIS coordinates.
+> **[Input]**: (Paste Book A summary here)
+> **[Output]**: JSON script for MAPWAR engine.
+
+---
+
+### EP01-EP11 分集规划 (已更新)
+
+*遵循“Operation Name”命名法*
+
+*   **EP01：The OATS Surprise (阏与奇袭)** - 重点：山地行军 vs 补给极限。
+*   **EP02：The Hudan Encirclement (平阳围歼)** - 重点：野战阵型与围点打援。
+*   **EP03：Li Mu's Trap (肥下反击)** - 重点：信息战与预设战场。
+*   ... (后续剧集按此风格推进)

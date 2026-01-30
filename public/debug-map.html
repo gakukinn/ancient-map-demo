@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>地图调试</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { margin: 0; padding: 20px; background: #000; color: #fff; }
+        #info { position: fixed; top: 10px; left: 10px; z-index: 9999; background: rgba(0,0,0,0.8); padding: 10px; }
+        #map { width: 800px; height: 600px; border: 2px solid red; }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h3>调试信息</h3>
+        <div id="status">初始化中...</div>
+    </div>
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        const status = document.getElementById('status');
+
+        function log(msg) {
+            console.log(msg);
+            status.innerHTML += '<br>' + msg;
+        }
+
+        log('Leaflet版本: ' + L.version);
+
+        // 创建地图
+        const map = L.map('map', {
+            center: [34.26, 108.94],
+            zoom: 8,
+            minZoom: 8,
+            maxZoom: 8
+        });
+
+        log('地图对象已创建');
+
+        // 测试用不同的瓦片URL
+        const tileUrls = [
+            // 测试1: URL编码的路径
+            '/9dixingtu/Google%20Terrain%20Maps%20without%20labels%20%20roads%20and%20POI%20%20512px/{z}/{x}/{y}.jpg',
+            // 测试2: 原始路径(让浏览器自动编码)
+            '/9dixingtu/Google Terrain Maps without labels  roads and POI  512px/{z}/{x}/{y}.jpg'
+        ];
+
+        let currentTest = 0;
+
+        function testTileUrl() {
+            if (currentTest >= tileUrls.length) {
+                log('所有测试完成');
+                return;
+            }
+
+            const url = tileUrls[currentTest];
+            log(`<br><strong>测试 ${currentTest + 1}:</strong> ${url.substring(0, 50)}...`);
+
+            const layer = L.tileLayer(url, {
+                tileSize: 512,
+                zoomOffset: 1,
+                minZoom: 8,
+                maxZoom: 8
+            });
+
+            let loadCount = 0;
+            let errorCount = 0;
+
+            layer.on('tileload', (e) => {
+                loadCount++;
+                log(`✅ 成功 #${loadCount}: ${e.tile.src.substring(e.tile.src.lastIndexOf('/') + 1)}`);
+            });
+
+            layer.on('tileerror', (e) => {
+                errorCount++;
+                log(`❌ 失败 #${errorCount}: ${e.tile.src}`);
+            });
+
+            layer.addTo(map);
+
+            // 5秒后切换到下一个测试
+            setTimeout(() => {
+                map.removeLayer(layer);
+                log(`测试结束: ${loadCount}个成功, ${errorCount}个失败`);
+                currentTest++;
+                setTimeout(testTileUrl, 1000);
+            }, 5000);
+        }
+
+        testTileUrl();
+    </script>
+</body>
+</html>

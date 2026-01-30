@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAPWAR 原型</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <!-- SVG Filters for Map Effects -->
+    <svg style="position: absolute; height: 0; width: 0; pointer-events: none;">
+        <defs>
+            <filter id="rough-edge">
+                <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="2" result="noise" />
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+            </filter>
+        </defs>
+    </svg>
+    <div id="notification-area"></div>
+
+    <div id="hud" class="hud">
+        <div class="info-panel">
+            <div class="info-row">
+                <span class="label">日期:</span>
+                <span class="value" id="game-date">载入中...</span>
+            </div>
+            <div class="control-row">
+                <button id="pause-btn" class="speed-btn">⏸️ 暂停</button>
+                <button id="speed-1x" class="speed-btn active">1x</button>
+                <button id="speed-2x" class="speed-btn">2x</button>
+                <button id="speed-5x" class="speed-btn">5x</button>
+                <button id="speed-10x" class="speed-btn">10x</button>
+            </div>
+            <div class="control-row" style="margin-top: 8px;">
+                <button id="toggle-history-btn" class="ui-toggle-btn-hud" title="开启/关闭历史事件 (自动触发攻城/剧情)">
+                    📜 历史: ON
+                </button>
+                <button id="toggle-npc-btn" class="ui-toggle-btn-hud" style="margin-left: 10px;" title="显示/隐藏 NPC">
+                    🤖 NPC: OFF
+                </button>
+            </div>
+        </div>
+        <div class="info-panel">
+            <div class="info-row">
+                <span class="label">坐标:</span>
+                <span class="value" id="coords">0, 0</span>
+            </div>
+            <div class="info-row">
+                <span class="label">六边形:</span>
+                <span class="value" id="hex-coords">0, 0</span>
+            </div>
+            <div class="info-row">
+                <span class="label">地形:</span>
+                <span class="value" id="terrain-type">-</span>
+            </div>
+            <div id="player-speed" class="info-row"
+                style="margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px;">
+                <span class="label">移动速度:</span>
+                <span class="value">1.0x</span>
+            </div>
+        </div>
+
+        <!-- 玩家信息面板 -->
+        <div class="player-info info-panel" style="display: none;">
+            <div class="player-title">👤 玩家信息</div>
+            <div class="player-stats">
+                <div class="stat-row">
+                    <span class="stat-label">官职:</span>
+                    <span class="stat-value" id="player-rank">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">兵力:</span>
+                    <span class="stat-value" id="player-troops">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">功勋:</span>
+                    <span class="stat-value" id="player-merit">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">势力:</span>
+                    <span class="stat-value" id="player-faction">未选择</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">无敌:</span>
+                    <button id="toggle-invincible"
+                        style="background: none; border: 1px solid #666; cursor: pointer; color: #aaa; padding: 0 4px; border-radius: 4px; font-size: 0.9em;">关闭</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 地形编辑器控件 -->
+    </div>
+
+    <!-- 地形编辑器 UI 已移至 TypeScript (MaskEditorAdapter.ts) -->
+
+
+
+    <!-- 通用模态框 -->
+
+
+    <!-- Leaflet script removed, using npm package -->
+    <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
