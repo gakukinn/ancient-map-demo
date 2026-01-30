@@ -63,3 +63,6 @@
     - [x] Remove hardcoded script dependencies (Make it playable without `script.json`).
     - [x] Build & Deploy to Vercel/Itch.io.
     - [x] Configure GitHub Pages Source to "GitHub Actions" (User confirmed).
+- [x] Investigate and fix missing city textures (path resolution issue)
+    - [x] Create `PathUtils.ts` with `resolvePath`
+    - [x] Refactor `RegionSystem.ts` to use `resolvePath`
