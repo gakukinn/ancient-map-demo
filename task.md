@@ -62,3 +62,4 @@
 - [x] **Web Release Prep**
     - [x] Remove hardcoded script dependencies (Make it playable without `script.json`).
     - [x] Build & Deploy to Vercel/Itch.io.
+    - [x] Configure GitHub Pages Source to "GitHub Actions" (User confirmed).
