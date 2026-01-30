@@ -59,6 +59,6 @@
     - [ ] **Selection System**: Implement mouse click to select armies/cities.
     - [ ] **Command Panel**: UI to control selected unit (Kill, Heal, Change Target).
     - [ ] **Instant Spawn**: Shift+Click to spawn random units for chaos testing.
-- [ ] **Web Release Prep**
-    - [ ] Remove hardcoded script dependencies (Make it playable without `script.json`).
-    - [ ] Build & Deploy to Vercel/Itch.io.
+- [x] **Web Release Prep**
+    - [x] Remove hardcoded script dependencies (Make it playable without `script.json`).
+    - [x] Build & Deploy to Vercel/Itch.io.

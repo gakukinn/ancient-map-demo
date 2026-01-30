@@ -2,6 +2,7 @@
   "name": "mapwar",
   "version": "1.0.0",
   "description": "MAPWAR 是一个正在搭建中的历史地图沙盘原型，目标是在真实地形图上重现春秋战国时期的势力、城市与兵力演化。当前代码侧重于最小可运行的演示：",
+  "homepage": "https://gakukinn.github.io/ancient-map-demo/",
   "main": "game.js",
   "directories": {
     "doc": "docs"

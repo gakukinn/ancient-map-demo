@@ -1,0 +1,237 @@
+### 将领可视化 (General Visualization)
+
+为了突出英雄单位在战场上的存在感，渲染器实现了自动化的将领替换逻辑：
+
+*   **自动识别**: 当渲染军团时，系统会自动激活将领图层。
+*   **阵位替换**:
+    *   **步兵 (3x3)**: 替换正中心单位 (Index 4)。
+    *   **骑兵 (Wedge)**: 替换三角形锋矢位置 (Index 0)。
+    *   **混合 (Hex)**: 替换中军核心位置 (Index 3)。
+*   **独立资源**: 将领拥有独立的 S10DB 动作模组 (ID 240-279)，支持全套移动、攻击、受击动画。
+
+### 纯正染色技术 (True Color Tinting) [2026-01-16 Update]
+
+为了解决原始素材蓝色底色干扰阵营染色的问题 (如 蓝底+红染=紫色)，渲染层重构了 `SpriteTinter` 算法：
+
+*   **去色底 (Desaturation)**: 算法不再进行简单的 RGB 混合，而是先提取原始像素的 **亮度信息 (Luminance/Grayscale)**。
+*   **重着色 (Re-Coloring)**: 基于提取的灰度值与目标阵营色进行混合。
+    *   **公式**: `Pixel = Brightness * (1 - Intensity) + TargetColor * Intensity`
+    *   **结果**: 彻底消除了素材底色干扰，实现了 **"红即是红 (Red is Red)"** 的纯正色彩表现，同时保留了原始素材的光影立体感。
+
+---
+
+## 10. 🏰 攻城定位系统 (Siege Positioning System) - [2026-01-22 Update]
+
+### 核心问题与解决方案
+
+在六边形地图中，军队不能与城市重叠在同一个格子里。因此当军队发起攻城战时，需要将其定位到城市的**相邻六边形**上。
+
+#### 原始问题
+之前的实现存在"军队乱跳"的 Bug：军队从道路行军过来，攻城战开始后却被移动到完全错误的位置（如对面方向）。
+
+#### 问题根因
+经过深入排查，发现问题出在**两处代码同时尝试定位军队**：
+
+1. **`LegionManager.triggerSiege`**：碰撞检测触发攻城时，会尝试将军队移动到相邻格。
+2. **`SiegeManager.onArmyArrive`**：攻城逻辑开始时，再次尝试定位军队。
+
+更关键的是，碰撞检测的流程会**先回滚军队位置**：
+```
+军队尝试进入城市格 → 碰撞失败 → 位置回滚到道路格子 → 触发攻城
+```
+
+所以当攻城逻辑运行时，军队**已经在正确的道路格子上**了！但旧代码假设军队在城市格子内，试图把它"移出来"，导致了混乱。
+
+### 修复方案
+
+**核心原则：军队通过道路碰撞触发攻城时，已经在正确的位置上，不需要移动！**
+
+新逻辑（`SiegeManager.onArmyArrive`）：
+
+```typescript
+// Step 1: 获取军队当前实际位置
+const armyHex = GridSystem.latLngToAxial(army.getPosition());
+
+// Step 2: 检查是否已经在城市的相邻格
+const isAlreadyAdjacent = adjacentHexes.some(h => h.q === armyHex.q && h.r === armyHex.r);
+
+if (isAlreadyAdjacent) {
+    // ✅ 已在正确位置 → 只需吸附到格子中心，设置朝向
+    army.setPosition(hexCenter);
+    army.lastDirection = OrientationSystem.get8DirectionIndex(hexCenter, cityPos);
+} else {
+    // ⚠️ 不在相邻格（异常情况）→ 寻找最近空位并移动
+    // ...
+}
+```
+
+### 配置位置
+- 定位逻辑：`src/core/SiegeManager.ts` (第405-470行)
+- 碰撞检测：`src/core/LegionManager.ts` (第272-400行)
+
+### 设计要点
+
+1. **单一定位点**：所有攻城定位逻辑统一在 `SiegeManager.onArmyArrive` 处理，`LegionManager.triggerSiege` 不再进行任何位置操作。
+2. **状态检查优先**：先判断军队当前状态，而非盲目执行移动。
+3. **朝向自动计算**：使用 `OrientationSystem.get8DirectionIndex` 确保军队面向城市。
+
+
+## 11. 🌏 地形识别技术 (Terrain Identification Tech) - [2026-01-23 Update]
+
+### 极速全图扫描 (Tile-First Architecture)
+
+为了自动识别游戏中的陆地与海洋（用于决定单位通行权），系统实施了一套基于 **"Tile-First"（瓦片优先）** 架构的扫描方案，成功将 100,000+ 六边形的识别时间从 5分钟+ 降低至 **20秒**。
+
+#### 1. 核心挑战
+
+传统的扫描方法是 **Hex-Centric**（六边形中心）：
+1. 遍历每个六边形（10万+）。
+2. 计算其中心经纬度。
+3. 发起一次网络请求（或调用 `getImageData`）获取该点海拔。
+4. **问题**：即使有缓存，10万次异步 Promise 调用和上下文切换也会导致巨大的 CPU 开销和 Event Loop 阻塞。
+
+#### 2. 解决方案：Tile-First 架构
+
+新架构将流程反转：
+
+1. **预计算瓦片需求 (Pre-calculation)**:
+   - 首先遍历所有目标六边形，计算出它们总共覆盖了哪些唯一瓦片（Unique Tiles）。
+   - 在 Zoom 7 下，全球范围仅需约 1000-2000 张瓦片。
+
+2. **批量并行下载 (Batch Prefetch)**:
+   - 使用 `Promise.all` 并发下载所有唯一瓦片（并发数 50）。
+   - 将瓦片绘制到离屏 Canvas 并提取 `ImageData` 存入内存 Map。
+   - **优势**：网络请求次数从 100,000 次降低到 1,000 次。
+
+3. **同步内存查表 (Synchronous Lookup)**:
+   - 瓦片就绪后，再次遍历所有六边形。
+   - 此时所有数据均在内存中，直接通过数组索引读取像素值（`imageData.data[idx]`）。
+   - **优势**：消除了所有异步等待，处理速度达到微秒级。
+
+#### 3. 数据源与算法
+
+*   **数据源**: Amazon S3 Terrarium Elevation Tiles
+    *   URL: `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png`
+*   **海拔解码**:
+    *   公式: `Elevation = (R * 256 + G + B / 256) - 32768`
+*   **判定规则**:
+    *   `Elevation > 0`: **陆地 (LAND)** -> 绿色
+    *   `Elevation <= 0`: **海洋 (OCEAN)** -> 深蓝色
+    *   **范围外处理**: 用户指定的矩形范围（Lat 0-60, Lng -19-146）之外的所有六边形，无论海拔如何，一律强制标记为 **海洋**（不可通行）。
+
+#### 4. 性能数据
+
+| 指标 | 旧方案 (Hex-Centric) | 新方案 (Tile-First) | 提升 |
+| :--- | :--- | :--- | :--- |
+| **网络请求** | 100,000+ (逻辑上) | ~1,500 (物理上) | **~60x** |
+| **总耗时** | 300秒+ | **20-30秒** | **~10x** |
+| **内存开销** | 高 (大量Promise对象) | 中 (ImageData缓存) | 稳定 |
+
+### 配置位置
+- 瓦片采样：`src/map/MapColorSampler.ts`
+
+
+## 12. 🚫 性能优化 (Performance Optimization) - [2026-01-24 Update]
+
+### 优先队列与时间分片 (Priority Queue & Time Slicing)
+
+为了彻底解决大规模领土计算（如攻陷大城）导致的 **1000ms+ 主线程卡顿**，`TerritorySystem` 实施了两项核心优化：
+
+#### 1. 全局 Dijkstra 算法 (Global Dijkstra)
+*   **旧方案**: 轮询式 BFS (`Round-Robin BFS`)。每轮循环都要遍历所有 300+ 个候选城市，寻找当前成本最低的扩展点。复杂度高达 `O(Hexes * Cities)`。
+*   **新方案**: **基于优先队列的 Dijkstra**。
+    *   引入了 `src/utils/PriorityQueue.ts` (Min-Heap)。
+    *   所有城市的扩张前沿（Frontier）统一放入一个全局堆中。
+    *   每次仅需 O(1) 取出全局最优解，将复杂度降低至 `O(Hexes * log(Frontier))`。
+
+#### 2. 严格时间分片 (Strict Time Slicing)
+*   **问题**: 即使算法优化了，一次性计算数千个格子的归属权仍可能耗时 50-100ms，导致掉帧。
+*   **解决**: 引入 `performance.now()` 精确计时。
+    *   在 Dijkstra 的 `while` 循环内部，每一步都检查当前帧耗时。
+    *   一旦超过 **12ms** (预留 4ms 给渲染)，立即 `ensure requestAnimationFrame` 挂起当前任务，将剩余计算推迟到下一帧。
+*   **效果**: 领土变更不再是“瞬间卡顿后刷新”，而是平滑地在 2-3 帧内“流式”展开，彻底消除了长帧卡顿。
+
+### 核心代码
+- 领土算法：`src/systems/TerritorySystem.ts` -> `update()`
+- 优先队列：`src/utils/PriorityQueue.ts`
+
+## 13. 🛡️ 禁卫军团与单位视觉优化 (Xiyang Legion & Visual Polish) - [2026-01-26 Update]
+
+### 禁卫军团 (Xiyang Legion) 定制化
+针对特殊的禁卫军团（XP001），实现了完全自定义的渲染逻辑：
+
+1.  **特殊队形 (Custom Formation)**:
+    -   **一字长蛇阵 (Single Row)**: 摒弃了传统的 3x3 或楔形阵，实现了 5 人一排的横向布局。
+    -   **对称布局**: 以旗手 (Index 1) 为中心 (0,0)，左右各分布两名卫兵。
+        -   Index 4 (-2x) | Index 0 (-1x) | **Index 1 (Flag)** | Index 2 (+1x) | Index 3 (+2x)
+
+2.  **逻辑修正 (Logic Fixes)**:
+    -   **缓存屏蔽**: 强制禁用 `offsetCache`，防止系统沿用旧的默认位置数据导致重叠。
+    -   **补位豁免**: 从 `LegionPhalanxDrawer` 的步兵自动补位逻辑（Crowding）中剔除，防止最外侧单位被强行拉回中间填补缝隙。
+
+### 视觉缩放统一 (Scale Standardization)
+解决了不同素材源带来的视觉大小差异问题：
+
+-   **突厥骑兵 (Tujue Cavalry)**: 原素材偏小。目前缩放比例维持在 **1.2x** 
+代码里有一句 if (name.includes('e_')) scale = 0.9 （本来是给“鄂军 e_infantry”用的）。 结果 tujue_cavalry 这个名字里刚好藏了一个 e_ (tujue_cavalry)！ 就是这个 Bug 把突厥骑兵强行缩小成了 0.9。彻底修复 Bug：把那个判断改成了“必须以 e_ 开头”，这样突厥就不会躺枪了。
+-   **混合缩放**: 确保前后排单位在应用不同素材（如前排S8YD vs 后排S8GJ）时，最终呈现的头部高度基本持平。
+
+## 14. 区域划分与地理规范 (Region Partitions & Geospatial Specs) - [2026-01-27 Update]
+
+系统采用严格的**经纬度方盒子 (Coordinate Box)** 逻辑替代了旧的多边形判定，实现了 18 个区域的无死角覆盖与确定的视觉分化。
+
+### 核心区域概览 (18 Regions)
+
+| 区域 ID | 中文名 | 路面风格 | 地理范围 (Approx.) |
+| :--- | :--- | :--- | :--- |
+| **SIBERIA** | 极北 | **雪路** | > 50°N 全球范围 |
+| **NORTHEAST**| 东北 | **雪路** | > 40°N 且 > 123°E |
+| **TIBET** | 西藏 | **雪路** | 29°N-36°N, 78°E-101°E (强制特例) |
+| **NOMADIC** | 塞外 | **草原** | 41°N-50°N 且 <= 123°E (剔除西域部分) |
+| **WESTERN** | 西域 | **黄路** | 36°N-44°N 且 <= 93°E |
+| **NORTHWEST**| 西北 | **黄路** | 36°N-41°N, 93°E-108°E (含天水) |
+| **NORTH** | 北方 | **黄路** | 36°N-41°N, 108°E-123°E |
+| **CENTRAL** | 中原 | **土路** | 32°N-36°N, 108°E-123°E (含汉中扩展) |
+| **KOREA** | 朝鲜 | **土路** | 33°N-40°N, 123°E-129.5°E |
+| **JAPAN** | 日本 | **土路** | <= 40°N 且 > 129.5°E |
+| **CHU_SHU** | 楚蜀 | **泥路** | <= 32°N, 101°E-111°E (云贵川) |
+| **SOUTH** | 南方 | **泥路** | 26°N-32°N, 111°E-123°E (江南) |
+| **LINGNAN** | 岭南 | **泥路** | < 26°N 且 > 105°E |
+| **TROPICS** | 热带 | **泥路** | < 19°N 全球范围 |
+| **WEST_WORLD**| 西方 | **土路** | < 60°E |
+| **CENTRAL_WORLD**| 中亚 | **黄路** | 60°E-97°E (温带区) |
+| **SOUTH_HEMISPHERE**| 南半球 | **默认** | < 0° (纬度) |
+| **NEW_WORLD** | 新大陆 | **默认** | > 170°E 或 < -30°E |
+
+### 判定逻辑优先级 (Decision Logic)
+
+判定函数 `RegionSystem.getRegion` 严格按以下顺序执行，确保特例优先：
+
+1.  **全球滤镜**: 优先判定南半球、极北(>50N)和热带(<19N)。
+2.  **强制特例箱 (User Boxes)**: 判定 **西藏** 和 **日本**（此时日本定位在 123E 以东）。
+3.  **西域优先 (Western Special)**: 判定 **93E 以西** 的西域区，防止其被草原带错误切割。
+4.  **塞外草原带 (Steppe Band)**: 判定 **41N-50N** 且在 **123E 以西** 的所有区域为草原。
+5.  **经度大分割**:
+    - **西方/中亚世界**: 处理 97E 以西的非特例区域。
+    - **东亚核心区**: 
+        - **东北/朝鲜**: 以 40N 指标线在 123E 以东切分。
+        - **西北**: 34N-41N 之间的黄土区域。
+        - **北方/中原**: 采用密集堆叠规则，含**汉中 (106-108E)** 的文化归属修正。
+        - **南方/岭南/楚蜀**: 采用“岭南优先”原则，确保云贵川逻辑不干扰两广沿海判定。
+
+### 技术实现
+- **文件**: `src/systems/RegionSystem.ts`
+- **机制**: 实时经纬度映射，无多边形计算开销，支持 10FPS 以上的动态刷新。
+
+## 15. 常见问题 (Troubleshooting) - [2026-01-27 Update]
+
+### 道路不可见问题 (Invisible Roads)
+如果您在 `src/data/RoadData.ts` 中添加了新的道路坐标，刷新页面后却无法显示，请检查以下两点：
+
+1.  **数据位置错误 (Wrong Array)**:
+    *   **现象**: 坐标数据位于文件**最末尾**。
+    *   **原因**: `RoadData.ts` 文件末尾定义了一个 `DISABLED_ROADS_DATA`（禁用道路）数组。如果您直接在文件底部的 `];` 前插入数据，实际上是将道路加入了禁用列表。
+    *   **解决**: 请确保将新数据添加到文件上方的 **`CUSTOM_ROADS_DATA`** 数组中（约第 3300 行附近）。
+
+2.  **区域纹理缺失 (Missing Texture)**:
+    *   确保该区域（如 `NOMADIC` / `SIBERIA`）在 `RoadLayer.ts` 中有对应的纹理映射。

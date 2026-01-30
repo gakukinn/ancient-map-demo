@@ -29,3 +29,12 @@
 访问 GitHub Pages 链接即可直接在浏览器中浏览古代地形。
 
 *(注：本项目为纯地图演示版本，不包含游戏性功能)*
+
+## 🚀 部署与访问 (Deployment)
+
+本项目配置了 GitHub Actions 自动部署。
+
+1. **访问地址**: [https://gakukinn.github.io/ancient-map-demo/](https://gakukinn.github.io/ancient-map-demo/)
+2. **如何更新**:
+   - 任何推送到 `main` 分支的代码提交都会自动触发构建和部署。
+   - 部署过程通常需要 1-2 分钟。可在 GitHub 仓库的 "Actions" 标签页查看进度。

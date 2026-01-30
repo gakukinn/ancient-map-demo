@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: './',
+  base: '/ancient-map-demo/',
   // 开发服务器配置
   server: {
     port: 3000,
