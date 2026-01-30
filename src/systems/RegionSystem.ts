@@ -1,5 +1,6 @@
 import { CityType } from '../types/core';
 import { CITY_CONFIG } from '../config/CityConfig';
+import { resolvePath } from '../utils/PathUtils';
 
 // 1. Definition of Regions and Styles
 export type RegionType =
@@ -222,131 +223,131 @@ export function getCityRegion(city: { latitude: number; longitude: number; regio
 // 4. Style Mapping Table
 const STYLE_MAP: Record<RegionType, { small: string, medium: string, big: string, pass: string, ferry: string }> = {
     CENTRAL: {
-        small: '/cities/central_small.png',
-        medium: '/cities/central_medium.png',
-        big: '/cities/central_big.png',
-        pass: '/cities/central_pass.png',
-        ferry: '/cities/central_ferry.png'
+        small: resolvePath('/cities/central_small.png'),
+        medium: resolvePath('/cities/central_medium.png'),
+        big: resolvePath('/cities/central_big.png'),
+        pass: resolvePath('/cities/central_pass.png'),
+        ferry: resolvePath('/cities/central_ferry.png')
     },
     NORTH: {
-        small: '/cities/north_small.png',
-        medium: '/cities/north_medium.png',
-        big: '/cities/north_big.png',
-        pass: '/cities/north_pass.png',
-        ferry: '/cities/north_ferry.png'
+        small: resolvePath('/cities/north_small.png'),
+        medium: resolvePath('/cities/north_medium.png'),
+        big: resolvePath('/cities/north_big.png'),
+        pass: resolvePath('/cities/north_pass.png'),
+        ferry: resolvePath('/cities/north_ferry.png')
     },
     SOUTH: {
-        small: '/cities/south_small.png',
-        medium: '/cities/south_medium.png',
-        big: '/cities/south_big.png',
-        pass: '/cities/south_pass.png',
-        ferry: '/cities/south_ferry.png'
+        small: resolvePath('/cities/south_small.png'),
+        medium: resolvePath('/cities/south_medium.png'),
+        big: resolvePath('/cities/south_big.png'),
+        pass: resolvePath('/cities/south_pass.png'),
+        ferry: resolvePath('/cities/south_ferry.png')
     },
     CHU_SHU: {
-        small: '/cities/chushu_small.png',
-        medium: '/cities/chushu_medium.png',
-        big: '/cities/chushu_big.png',
-        pass: '/cities/chushu_pass.png',
-        ferry: '/cities/chushu_ferry.png'
+        small: resolvePath('/cities/chushu_small.png'),
+        medium: resolvePath('/cities/chushu_medium.png'),
+        big: resolvePath('/cities/chushu_big.png'),
+        pass: resolvePath('/cities/chushu_pass.png'),
+        ferry: resolvePath('/cities/chushu_ferry.png')
     },
     LINGNAN: {
-        small: '/cities/lingnan_small.png',
-        medium: '/cities/lingnan_medium.png',
-        big: '/cities/lingnan_big.png',
-        pass: '/cities/lingnan_pass.png',
-        ferry: '/cities/lingnan_ferry.png'
+        small: resolvePath('/cities/lingnan_small.png'),
+        medium: resolvePath('/cities/lingnan_medium.png'),
+        big: resolvePath('/cities/lingnan_big.png'),
+        pass: resolvePath('/cities/lingnan_pass.png'),
+        ferry: resolvePath('/cities/lingnan_ferry.png')
     },
     NORTHWEST: {
-        small: '/cities/northwest_small.png',
-        medium: '/cities/northwest_medium.png',
-        big: '/cities/northwest_big.png',
-        pass: '/cities/northwest_pass.png',
-        ferry: '/cities/northwest_ferry.png'
+        small: resolvePath('/cities/northwest_small.png'),
+        medium: resolvePath('/cities/northwest_medium.png'),
+        big: resolvePath('/cities/northwest_big.png'),
+        pass: resolvePath('/cities/northwest_pass.png'),
+        ferry: resolvePath('/cities/northwest_ferry.png')
     },
     WESTERN: {
-        small: '/cities/western_small.png',
-        medium: '/cities/western_medium.png',
-        big: '/cities/western_big.png',
-        pass: '/cities/western_pass.png',
-        ferry: '/cities/western_ferry.png'
+        small: resolvePath('/cities/western_small.png'),
+        medium: resolvePath('/cities/western_medium.png'),
+        big: resolvePath('/cities/western_big.png'),
+        pass: resolvePath('/cities/western_pass.png'),
+        ferry: resolvePath('/cities/western_ferry.png')
     },
     NOMADIC: {
-        small: '/cities/nomadic_small.png',
-        medium: '/cities/nomadic_medium.png',
-        big: '/cities/nomadic_big.png',
-        pass: '/cities/nomadic_pass.png',
-        ferry: '/cities/nomadic_ferry.png'
+        small: resolvePath('/cities/nomadic_small.png'),
+        medium: resolvePath('/cities/nomadic_medium.png'),
+        big: resolvePath('/cities/nomadic_big.png'),
+        pass: resolvePath('/cities/nomadic_pass.png'),
+        ferry: resolvePath('/cities/nomadic_ferry.png')
     },
     NORTHEAST: {
-        small: '/cities/northeast_small.png',
-        medium: '/cities/northeast_medium.png',
-        big: '/cities/northeast_big.png',
-        pass: '/cities/northeast_pass.png',
-        ferry: '/cities/northeast_ferry.png'
+        small: resolvePath('/cities/northeast_small.png'),
+        medium: resolvePath('/cities/northeast_medium.png'),
+        big: resolvePath('/cities/northeast_big.png'),
+        pass: resolvePath('/cities/northeast_pass.png'),
+        ferry: resolvePath('/cities/northeast_ferry.png')
     },
     TIBET: {
-        small: '/cities/tibet_small.png',
-        medium: '/cities/tibet_medium.png',
-        big: '/cities/tibet_big.png',
-        pass: '/cities/tibet_pass.png',
-        ferry: '/cities/tibet_ferry.png'
+        small: resolvePath('/cities/tibet_small.png'),
+        medium: resolvePath('/cities/tibet_medium.png'),
+        big: resolvePath('/cities/tibet_big.png'),
+        pass: resolvePath('/cities/tibet_pass.png'),
+        ferry: resolvePath('/cities/tibet_ferry.png')
     },
     JAPAN: {
-        small: '/cities/japan_small.png',
-        medium: '/cities/japan_medium.png',
-        big: '/cities/japan_big.png',
-        pass: '/cities/japan_pass.png',
-        ferry: '/cities/japan_ferry.png'
+        small: resolvePath('/cities/japan_small.png'),
+        medium: resolvePath('/cities/japan_medium.png'),
+        big: resolvePath('/cities/japan_big.png'),
+        pass: resolvePath('/cities/japan_pass.png'),
+        ferry: resolvePath('/cities/japan_ferry.png')
     },
     KOREA: {
-        small: '/cities/korea_small.png',
-        medium: '/cities/korea_medium.png',
-        big: '/cities/korea_big.png',
-        pass: '/cities/korea_pass.png',
-        ferry: '/cities/korea_ferry.png'
+        small: resolvePath('/cities/korea_small.png'),
+        medium: resolvePath('/cities/korea_medium.png'),
+        big: resolvePath('/cities/korea_big.png'),
+        pass: resolvePath('/cities/korea_pass.png'),
+        ferry: resolvePath('/cities/korea_ferry.png')
     },
     // New Regions (Mapped to existing styles for now)
     SIBERIA: { // Use Northeast Style
-        small: '/cities/northeast_small.png',
-        medium: '/cities/northeast_medium.png',
-        big: '/cities/northeast_big.png',
-        pass: '/cities/northeast_pass.png',
-        ferry: '/cities/northeast_ferry.png'
+        small: resolvePath('/cities/northeast_small.png'),
+        medium: resolvePath('/cities/northeast_medium.png'),
+        big: resolvePath('/cities/northeast_big.png'),
+        pass: resolvePath('/cities/northeast_pass.png'),
+        ferry: resolvePath('/cities/northeast_ferry.png')
     },
     TROPICS: { // Use Lingnan Style
-        small: '/cities/lingnan_small.png',
-        medium: '/cities/lingnan_medium.png',
-        big: '/cities/lingnan_big.png',
-        pass: '/cities/lingnan_pass.png',
-        ferry: '/cities/lingnan_ferry.png'
+        small: resolvePath('/cities/lingnan_small.png'),
+        medium: resolvePath('/cities/lingnan_medium.png'),
+        big: resolvePath('/cities/lingnan_big.png'),
+        pass: resolvePath('/cities/lingnan_pass.png'),
+        ferry: resolvePath('/cities/lingnan_ferry.png')
     },
     SOUTH_HEMISPHERE: { // Fallback
-        small: '/cities/central_small.png',
-        medium: '/cities/central_medium.png',
-        big: '/cities/central_big.png',
-        pass: '/cities/central_pass.png',
-        ferry: '/cities/central_ferry.png'
+        small: resolvePath('/cities/central_small.png'),
+        medium: resolvePath('/cities/central_medium.png'),
+        big: resolvePath('/cities/central_big.png'),
+        pass: resolvePath('/cities/central_pass.png'),
+        ferry: resolvePath('/cities/central_ferry.png')
     },
     NEW_WORLD: { // Fallback
-        small: '/cities/central_small.png',
-        medium: '/cities/central_medium.png',
-        big: '/cities/central_big.png',
-        pass: '/cities/central_pass.png',
-        ferry: '/cities/central_ferry.png'
+        small: resolvePath('/cities/central_small.png'),
+        medium: resolvePath('/cities/central_medium.png'),
+        big: resolvePath('/cities/central_big.png'),
+        pass: resolvePath('/cities/central_pass.png'),
+        ferry: resolvePath('/cities/central_ferry.png')
     },
     WEST_WORLD: { // Use Central Style for now
-        small: '/cities/central_small.png',
-        medium: '/cities/central_medium.png',
-        big: '/cities/central_big.png',
-        pass: '/cities/central_pass.png',
-        ferry: '/cities/central_ferry.png'
+        small: resolvePath('/cities/central_small.png'),
+        medium: resolvePath('/cities/central_medium.png'),
+        big: resolvePath('/cities/central_big.png'),
+        pass: resolvePath('/cities/central_pass.png'),
+        ferry: resolvePath('/cities/central_ferry.png')
     },
     CENTRAL_WORLD: { // Use Western Style
-        small: '/cities/western_small.png',
-        medium: '/cities/western_medium.png',
-        big: '/cities/western_big.png',
-        pass: '/cities/western_pass.png',
-        ferry: '/cities/western_ferry.png'
+        small: resolvePath('/cities/western_small.png'),
+        medium: resolvePath('/cities/western_medium.png'),
+        big: resolvePath('/cities/western_big.png'),
+        pass: resolvePath('/cities/western_pass.png'),
+        ferry: resolvePath('/cities/western_ferry.png')
     }
 };
 
@@ -358,14 +359,14 @@ export function getCityImage(city: { lat?: number; lng?: number; latitude?: numb
 
     if (lat === undefined || lng === undefined) {
         console.warn(`[RegionSystem] City ${city.id} missing coordinates!`);
-        return '/cities/city_small.png';
+        return resolvePath('/cities/city_small.png');
     }
 
     // 1. Force Giant Specifics (Strict 4 Cities)
-    if (city.id === 'changan') return '/cities/changan.png'; // 34, 108 (Central)
-    if (city.id === 'luoyang') return '/cities/luoyang.png';
-    if (city.id === 'nanjing') return '/cities/nanjing.png';
-    if (city.id === 'youzhou') return '/cities/beijing.png'; // Beijing/Youzhou
+    if (city.id === 'changan') return resolvePath('/cities/changan.png'); // 34, 108 (Central)
+    if (city.id === 'luoyang') return resolvePath('/cities/luoyang.png');
+    if (city.id === 'nanjing') return resolvePath('/cities/nanjing.png');
+    if (city.id === 'youzhou') return resolvePath('/cities/beijing.png'); // Beijing/Youzhou
 
     // 2. Identify Scale
     const config = CITY_CONFIG[city.type];

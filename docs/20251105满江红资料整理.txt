@@ -3,6 +3,8 @@ npm run dev
 请分析问题，只提出优化建议，不许擅自修改代码，不许擅自添加逻辑。
 请执行，只做最小改动。
 
+git push origin main
+
     | 'CENTRAL'  // 中原
     | 'NORTH'    // 北方
     | 'SOUTH'    // 江南
