@@ -99,25 +99,20 @@ export class HillshadeLayer extends L.GridLayer {
 
         const img = new Image();
         img.crossOrigin = "Anonymous";
-        // Use high-res tiles if zoom is high? 
-        // Standard endpoint:
         const url = `https://s3.amazonaws.com/elevation-tiles-prod/terrarium/${coords.z}/${coords.x}/${coords.y}.png`;
         img.src = url;
 
         img.onload = () => {
-            // Draw image to canvas to get pixel data
-            ctx.drawImage(img, 0, 0);
-            // Verify context read
-            try {
-                const imgData = ctx.getImageData(0, 0, size.x, size.y);
-
+            // [OPTIMIZATION] Use createImageBitmap to avoid main thread decoding & canvas read
+            createImageBitmap(img).then(bitmap => {
                 // Prepare Worker Request
                 const reqId = this.msgIdCounter++;
                 const request: HillshadeRequest = {
                     id: reqId,
                     width: size.x,
                     height: size.y,
-                    data: imgData.data, // Uint8ClampedArray transfers efficiently
+                    // data: null, // Will be handled via bitmap in worker
+                    bitmap: bitmap, // Pass Bitmap
                     params: {
                         azimuth: (this.options as HillshadeOptions).azimuth || 315,
                         altitude: (this.options as HillshadeOptions).altitude || 40,
@@ -130,18 +125,13 @@ export class HillshadeLayer extends L.GridLayer {
                 // Store callback info
                 this.pendingTiles.set(reqId, { ctx, tile, done });
 
-                // [PERF] Zero-Copy Transfer: Move buffer ownership to Worker
-                // This avoids deep-copying the ~256KB image data
-                const buffer = imgData.data.buffer.slice(0); // Clone buffer to transfer
-                const transferableData = new Uint8ClampedArray(buffer);
-                const transferableRequest = { ...request, data: transferableData };
-                this.worker.postMessage(transferableRequest, [buffer]);
+                // [PERF] Zero-Copy Transfer: Transfer ownership of Bitmap to Worker
+                this.worker.postMessage(request, [bitmap]);
 
-            } catch (err) {
-                console.error('Hillshade read error (cors?):', err);
-                // Fallback or finish
+            }).catch(err => {
+                console.error('Bitmap creation failed:', err);
                 done(undefined, tile);
-            }
+            });
         };
 
         img.onerror = () => {

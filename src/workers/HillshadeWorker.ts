@@ -4,11 +4,12 @@
  */
 
 // Define message types
+// Define message types
 export interface HillshadeRequest {
     id: number;
     width: number;
     height: number;
-    data: Uint8ClampedArray; // Heightmap pixels
+    bitmap: ImageBitmap; // [NEW] Receive bitmap instead of raw data
     params: {
         azimuth: number;
         altitude: number;
@@ -53,9 +54,9 @@ function initLUTs() {
     const loessYellow = [212, 192, 138];
     const loessMid = [195, 180, 140];
     const gobiBrown = [170, 160, 145];
-    const transitionBrown = [165, 150, 130];  // 更冷的灰棕色
-    const earthyRed = [140, 125, 115];        // 冷灰褐色，替代原红褐色
-    const rockGrey = [105, 105, 110];         // 稍暖的岩石灰
+    const transitionBrown = [165, 150, 130];
+    const earthyRed = [140, 125, 115];
+    const rockGrey = [105, 105, 110];
     const snowWhite = [255, 255, 255];
 
     for (let i = 0; i < range; i++) {
@@ -95,7 +96,19 @@ self.onmessage = (e: MessageEvent<HillshadeRequest>) => {
     initLUTs();
     if (!colorLUT || !noiseLUT) return;
 
-    const { id, width, height, data, params } = e.data;
+    const { id, width, height, bitmap, params } = e.data;
+
+    // [OPTIMIZATION] Use OffscreenCanvas to read pixels in Worker
+    // This removes the heavy 'getImageData' from the Main Thread
+    const offscreen = new OffscreenCanvas(width, height);
+    const ctx = offscreen.getContext('2d') as OffscreenCanvasRenderingContext2D;
+    ctx.drawImage(bitmap, 0, 0);
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const data = imgData.data;
+
+    // Free the bitmap memory immediately
+    bitmap.close();
+
     const output = new Uint8ClampedArray(width * height * 4);
 
     // Process params
@@ -144,6 +157,7 @@ self.onmessage = (e: MessageEvent<HillshadeRequest>) => {
             // Math
             const dzdx = ((zTR + 2 * zR + zBR) - (zTL + 2 * zL + zBL)) * INV_8;
             const dzdy = ((zBL + 2 * zB + zBR) - (zTL + 2 * zT + zTR)) * INV_8;
+
 
             const slope = Math.atan(Math.sqrt(dzdx * dzdx + dzdy * dzdy) / divisor);
             let aspect = Math.atan2(dzdy, -dzdx);

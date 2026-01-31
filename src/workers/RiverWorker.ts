@@ -1,13 +1,15 @@
 /**
  * RiverWorker - 水域检测 Web Worker
  * 分析 ESRI 瓦片像素，识别水域并渲染蓝色河流
+ * 
+ * [OPTIMIZED] 使用 OffscreenCanvas 在 Worker 中读取像素，避免主线程阻塞
  */
 
 export interface RiverWorkerRequest {
     id: number;
     width: number;
     height: number;
-    esriData: Uint8ClampedArray | null;
+    bitmap: ImageBitmap; // [NEW] 接收 ImageBitmap 而非原始数据
 }
 
 export interface RiverWorkerResponse {
@@ -16,17 +18,27 @@ export interface RiverWorkerResponse {
 }
 
 self.onmessage = (e: MessageEvent<RiverWorkerRequest>) => {
-    const { id, width, height, esriData } = e.data;
+    const { id, width, height, bitmap } = e.data;
     const len = width * height * 4;
 
     // Output buffer
     const outData = new Uint8ClampedArray(len);
 
-    // 如果没有 ESRI 数据，直接返回透明图层
-    if (!esriData) {
+    // 如果没有 bitmap，直接返回透明图层
+    if (!bitmap) {
         self.postMessage({ id, data: outData }, [outData.buffer] as any);
         return;
     }
+
+    // [OPTIMIZATION] 使用 OffscreenCanvas 在 Worker 中读取像素
+    const offscreen = new OffscreenCanvas(width, height);
+    const ctx = offscreen.getContext('2d') as OffscreenCanvasRenderingContext2D;
+    ctx.drawImage(bitmap, 0, 0);
+    const imgData = ctx.getImageData(0, 0, width, height);
+    const esriData = imgData.data;
+
+    // 释放 bitmap 内存
+    bitmap.close();
 
     // Intermediate buffer for "is water" mask (1 byte per pixel)
     const isRiver = new Uint8Array(width * height);

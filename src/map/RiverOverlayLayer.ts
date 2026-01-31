@@ -83,127 +83,42 @@ export class RiverOverlayLayer extends L.GridLayer {
             return tile;
         }
 
-        // 根据 zoom 选择本地瓦片路径
-        const localUrl = coords.z >= 10 ? this.localUrlZoom11 : this.localUrlZoom9;
-
-        // 构造瓦片 URL
+        // 构造 ESRI 瓦片 URL
         const esriTileUrl = this.esriUrl
             .replace('{z}', coords.z.toString())
             .replace('{y}', coords.y.toString())
             .replace('{x}', coords.x.toString());
 
-        const localTileUrl = localUrl
-            .replace('{x}', coords.x.toString())
-            .replace('{y}', coords.y.toString());
-
-        // 加载两张图片
+        // 加载图片
         const esriImg = new Image();
-        const localImg = new Image();
         esriImg.crossOrigin = 'Anonymous';
-        localImg.crossOrigin = 'Anonymous';
 
-        let esriLoaded = false;
-        let localLoaded = false;
-        // Keep data as buffer source
-        let esriData: Uint8ClampedArray | null = null;
-        let localData: Uint8ClampedArray | null = null;
-
-        const tryProcess = () => {
-            if (!esriLoaded || !localLoaded) return;
-
-            try {
-                // Prepare Worker Request
+        esriImg.onload = () => {
+            // [OPTIMIZATION] Use createImageBitmap to avoid main thread canvas read
+            createImageBitmap(esriImg).then(bitmap => {
                 const reqId = this.msgIdCounter++;
 
                 // Store callback info
                 this.pendingTiles.set(reqId, { ctx, tile, done });
 
-                // Send to worker
+                // Send to worker with bitmap transfer
                 this.worker.postMessage({
                     id: reqId,
                     width: size.x,
                     height: size.y,
-                    esriData: esriData, // PostMessage handles structured clone of TypedArrays (copy)
-                    localData: localData
-                });
+                    bitmap: bitmap // Pass bitmap instead of raw data
+                }, [bitmap]); // Transfer ownership
 
-            } catch (e) {
-                console.error('River tile dispatch error:', e);
-                done(e as Error, tile);
-            }
-        };
-
-        // Helper to get shared context
-        const getSharedCtx = (w: number, h: number) => {
-            if (!RiverOverlayLayer.sharedCanvas) {
-                RiverOverlayLayer.sharedCanvas = document.createElement('canvas');
-            }
-            const canvas = RiverOverlayLayer.sharedCanvas;
-            if (canvas.width !== w || canvas.height !== h) {
-                canvas.width = w;
-                canvas.height = h;
-            }
-
-            if (!RiverOverlayLayer.sharedCtx || RiverOverlayLayer.sharedCtx.canvas !== canvas) {
-                RiverOverlayLayer.sharedCtx = canvas.getContext('2d', { willReadFrequently: true });
-            }
-            return RiverOverlayLayer.sharedCtx;
-        };
-
-        // ESRI 图片加载
-        esriImg.onload = () => {
-            const shCtx = getSharedCtx(size.x, size.y);
-            if (shCtx) {
-                shCtx.clearRect(0, 0, size.x, size.y);
-                shCtx.drawImage(esriImg, 0, 0, size.x, size.y);
-                esriData = shCtx.getImageData(0, 0, size.x, size.y).data;
-            }
-            esriLoaded = true;
-            tryProcess();
+            }).catch(err => {
+                console.error('River bitmap creation failed:', err);
+                done(undefined, tile);
+            });
         };
 
         esriImg.onerror = () => {
-            // console.warn('Failed to load ESRI tile:', esriTileUrl);
-            esriLoaded = true;
-            tryProcess();
+            done(undefined, tile);
         };
 
-        // 本地图片加载 (已优化：纯净模式下跳过本地地形图读取，只使用ESRI判断河流)
-        // [OPTIMIZATION] Skip local tile load for static map to avoid 404s and redundant network
-        localLoaded = true;
-        tryProcess();
-
-        /* 
-        localImg.onload = () => {
-             const shCtx = getSharedCtx(size.x, size.y);
-             if (shCtx) {
-                 shCtx.clearRect(0, 0, size.x, size.y);
-                 shCtx.drawImage(localImg, 0, 0, size.x, size.y);
-                 localData = shCtx.getImageData(0, 0, size.x, size.y).data;
-             }
-             localLoaded = true;
-             tryProcess();
-         };
-
-         localImg.onerror = () => {
-             localLoaded = true;
-             tryProcess();
-         };
-         
-         localImg.src = localTileUrl; 
-         */
-
-        /*
-                localImg.onerror = () => {
-                    localLoaded = true;
-                    tryProcess();
-                };
-        
-                // 开始加载
-                esriImg.src = esriTileUrl;
-                localImg.src = localTileUrl;
-        */
-        // [OPTIMIZATION] Only load ESRI
         esriImg.src = esriTileUrl;
 
         return tile;
