@@ -1,9 +1,13 @@
+/**
+ * RiverWorker - 水域检测 Web Worker
+ * 分析 ESRI 瓦片像素，识别水域并渲染蓝色河流
+ */
+
 export interface RiverWorkerRequest {
     id: number;
     width: number;
     height: number;
     esriData: Uint8ClampedArray | null;
-    localData: Uint8ClampedArray | null;
 }
 
 export interface RiverWorkerResponse {
@@ -12,76 +16,68 @@ export interface RiverWorkerResponse {
 }
 
 self.onmessage = (e: MessageEvent<RiverWorkerRequest>) => {
-    const { id, width, height, esriData, localData } = e.data;
+    const { id, width, height, esriData } = e.data;
     const len = width * height * 4;
 
     // Output buffer
     const outData = new Uint8ClampedArray(len);
 
+    // 如果没有 ESRI 数据，直接返回透明图层
+    if (!esriData) {
+        self.postMessage({ id, data: outData }, [outData.buffer] as any);
+        return;
+    }
+
     // Intermediate buffer for "is water" mask (1 byte per pixel)
-    // Used for reliable edge detection
     const isRiver = new Uint8Array(width * height);
 
-    // 1. Identify Water Pixels
+    // 1. 识别水域像素
+    // [FIX] 收紧水域检测条件，防止山体阴影被误判为水域
+    // 条件：蓝色差值 +8，最低蓝色值 80，亮度范围 70-210
     for (let i = 0; i < len; i += 4) {
-        let isWaterPixel = false;
-        const idx = i / 4;
+        const r = esriData[i], g = esriData[i + 1], b = esriData[i + 2];
+        const brightness = (r + g + b) / 3;
 
-        // Check ESRI
-        if (esriData) {
-            const r = esriData[i], g = esriData[i + 1], b = esriData[i + 2];
-            if (b > r + 2 && b > g + 2 && b > 60 && (r < 250 || g < 250 || b < 250)) {
-                isWaterPixel = true;
-            }
-        }
-
-        // Check Local (Union)
-        if (!isWaterPixel && localData) {
-            const r = localData[i], g = localData[i + 1], b = localData[i + 2];
-            if (b > r + 2 && b > g + 2 && b > 60 && (r < 250 || g < 250 || b < 250)) {
-                isWaterPixel = true;
-            }
-        }
-
-        if (isWaterPixel) {
-            isRiver[idx] = 1;
+        // 水域特征：蓝色占优，亮度适中（非阴影），非纯白
+        if (b > r + 8 && b > g + 8 && b > 80 && brightness > 70 && brightness < 210 && (r < 250 || g < 250 || b < 250)) {
+            isRiver[i / 4] = 1;
         }
     }
 
-    // 2. Apply Styling & Edge Detection
+    // 2. 应用样式 & 边缘检测
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
             const idx = y * width + x;
             const pixelIdx = idx * 4;
 
             if (isRiver[idx]) {
-                // Check neighbors for edge
+                // 检测边缘
                 let isEdge = false;
-                if (y > 0 && !isRiver[idx - width]) isEdge = true; // Top
-                else if (y < height - 1 && !isRiver[idx + width]) isEdge = true; // Bottom
-                else if (x > 0 && !isRiver[idx - 1]) isEdge = true; // Left
-                else if (x < width - 1 && !isRiver[idx + 1]) isEdge = true; // Right
+                if (y > 0 && !isRiver[idx - width]) isEdge = true;
+                else if (y < height - 1 && !isRiver[idx + width]) isEdge = true;
+                else if (x > 0 && !isRiver[idx - 1]) isEdge = true;
+                else if (x < width - 1 && !isRiver[idx + 1]) isEdge = true;
 
                 if (isEdge) {
-                    // Edge Color
+                    // 边缘颜色（深蓝）
                     outData[pixelIdx] = 60;
                     outData[pixelIdx + 1] = 90;
                     outData[pixelIdx + 2] = 140;
                     outData[pixelIdx + 3] = 255;
                 } else {
-                    // Body Color
+                    // 主体颜色（浅蓝）
                     outData[pixelIdx] = 100;
                     outData[pixelIdx + 1] = 150;
                     outData[pixelIdx + 2] = 200;
                     outData[pixelIdx + 3] = 255;
                 }
             } else {
-                // Transparent
+                // 透明
                 outData[pixelIdx + 3] = 0;
             }
         }
     }
 
-    // Transfer back
+    // 返回结果
     self.postMessage({ id, data: outData }, [outData.buffer] as any);
 };
