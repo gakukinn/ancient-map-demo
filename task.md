@@ -66,3 +66,4 @@
 - [x] Investigate and fix missing city textures (path resolution issue)
     - [x] Create `PathUtils.ts` with `resolvePath`
     - [x] Refactor `RegionSystem.ts` to use `resolvePath`
+    - [x] Remove phantom asset references in `CityAssetManager.ts` & `UnitAssets.ts`
