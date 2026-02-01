@@ -362,13 +362,27 @@ export function getCityImage(city: { lat?: number; lng?: number; latitude?: numb
         return resolvePath('/cities/city_small.png');
     }
 
-    // 1. Force Giant Specifics (Strict 4 Cities)
-    if (city.id === 'changan') return resolvePath('/cities/changan.png'); // 34, 108 (Central)
-    if (city.id === 'luoyang') return resolvePath('/cities/luoyang.png');
-    if (city.id === 'nanjing') return resolvePath('/cities/nanjing.png');
-    if (city.id === 'youzhou') return resolvePath('/cities/beijing.png'); // Beijing/Youzhou
+    // 1. Force Giant Specifics (Strict 4 Cities + Western Cities)
+    if (city.id === 'changan') return resolvePath('/cities/zhiding/changan.png');
+    if (city.id === 'luoyang') return resolvePath('/cities/zhiding/luoyang.png');
+    if (city.id === 'nanjing') return resolvePath('/cities/zhiding/nanjing.png');
+    if (city.id === 'youzhou') return resolvePath('/cities/zhiding/beijing.png'); // Beijing
 
-    // 2. Identify Scale
+    // Western / Central Asian Cities
+    if (city.id === 'city_rome') return resolvePath('/cities/zhiding/luoma.png');
+    if (city.id === 'city_alexandria') return resolvePath('/cities/zhiding/yalishanda.png');
+    if (city.id === 'city_antioch') return resolvePath('/cities/zhiding/antiaoke.png');
+    if (city.id === 'city_damascus') return resolvePath('/cities/zhiding/damashige.png');
+    if (city.id === 'city_jerusalem') return resolvePath('/cities/zhiding/yelusaleng.png');
+    if (city.id === 'city_baghdad') return resolvePath('/cities/zhiding/bageda.png');
+    if (city.id === 'city_constantinople') return resolvePath('/cities/zhiding/junshitanding.png');
+    if (city.id === 'city_venice') return resolvePath('/cities/zhiding/weinisi.png');
+    if (city.id === 'city_samarhan') return resolvePath('/cities/zhiding/samaerhan.png');
+    if (city.id === 'city_buhala') return resolvePath('/cities/zhiding/buhala.png');
+    if (city.id === 'city_ctesiphon') return resolvePath('/cities/zhiding/taixifeng.png');
+    if (city.id === 'city_rayy') return resolvePath('/cities/zhiding/leiyi.png');
+    if (city.id === 'city_cheshi') return resolvePath('/cities/zhiding/tulufan.png'); // Gaochang
+
     const config = CITY_CONFIG[city.type];
     let scale: CityScale = 'small';
 
