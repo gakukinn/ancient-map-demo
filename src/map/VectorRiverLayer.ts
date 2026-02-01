@@ -7,95 +7,137 @@ import L from 'leaflet';
  * 数据源: Natural Earth Rivers + Lake Centerlines (1:10m)
  * 
  * [ENHANCEMENT] 双层渲染 (Casing)
- * 为了模拟真实地图的“黑边”效果，我们使用两层 GeoJSON：
+ * 为了模拟真实地图的"黑边"效果，我们使用两层 GeoJSON：
  * 1. 底层 (Border Layer): 深色，较宽 (Base + 2px)
  * 2. 顶层 (Water Layer): 浅蓝色，标准宽
+ * 
+ * [OPTIMIZATION] 预计算 + 双缓冲 (Pre-calculation & Double Buffering)
+ * 为了解决缩放时的性能问题和"乱飞"现象，我们在初始化时就生成两套图层：
+ * 1. WGS84 组 (Zoom 10+)
+ * 2. GCJ02 组 (Zoom 8-9)
+ * 运行时只需切换图层显示，无需任何计算。
  */
 export class VectorRiverLayer extends L.FeatureGroup {
-    private originalData: any;
+    private wgs84Group: L.FeatureGroup;
+    private gcj02Group: L.FeatureGroup;
     private currentOffsetMode: boolean = false;
-
-    // Two internal layers for the casing effect
-    private borderLayer: L.GeoJSON;
-    private waterLayer: L.GeoJSON;
 
     constructor(data: any, options?: L.LayerOptions) {
         super([], options); // Initialize empty FeatureGroup
 
-        // Store original WGS-84 data
-        this.originalData = JSON.parse(JSON.stringify(data));
+        // 1. 初始化 WGS84 组 (Create WGS84 Group)
+        this.wgs84Group = this.createRiverGroup(data, options?.pane);
 
-        // 1. Initialize Border Layer (Bottom)
-        // Darker, wider line to simulate "black border"
-        this.borderLayer = new L.GeoJSON(data, {
-            style: (feature) => VectorRiverLayer.getBorderStyle(feature, 9),
-            pane: options?.pane // Share properties
-        });
+        // 2. 预计算偏移数据 (Pre-calculate GCJ02 Data)
+        // [PERFORMANCE] Done once at startup, zero runtime cost later.
+        const offsetData = VectorRiverLayer.applyGCJ02Offset(data);
 
-        // 2. Initialize Water Layer (Top)
-        // Standard blue water
-        this.waterLayer = new L.GeoJSON(data, {
-            style: (feature) => VectorRiverLayer.getWaterStyle(feature, 9),
-            pane: options?.pane
-        });
+        // 3. 初始化 GCJ02 组 (Create GCJ02 Group)
+        this.gcj02Group = this.createRiverGroup(offsetData, options?.pane);
 
-        // Add to group (Order matters: Border first -> Bottom)
-        this.addLayer(this.borderLayer);
-        this.addLayer(this.waterLayer);
+        // 4. Default: Show WGS84 (Standard)
+        this.addLayer(this.wgs84Group);
+        // this.addLayer(this.gcj02Group); // Don't add yet
 
-        console.log('[VectorRiverLayer] Initialized Double-Layer Casing System');
+        console.log('[VectorRiverLayer] Initialized with Dual-Buffer (WGS84 + GCJ02) ready.');
     }
 
     /**
-     * [USER FEATURE] 动态切换坐标系
-     * Zoom <= 9: Enable GCJ-02 Offset (Align with Local Tiles)
-     * Zoom >= 10: Disable Offset (Align with WGS-84 / ESRI)
+     * 辅助方法：创建统一的双层河流组 (Border + Water)
+     * Reduces code duplication.
      */
-    public setOffsetMode(enable: boolean) {
-        if (this.currentOffsetMode === enable) return;
+    private createRiverGroup(data: any, pane?: string): L.FeatureGroup {
+        const group = new L.FeatureGroup();
 
-        console.log(`[VectorRiverLayer] Switching Offset Mode: ${enable ? 'GCJ-02 (Offset)' : 'WGS-84 (Standard)'}`);
+        // 1. Border Layer (Bottom)
+        const border = new L.GeoJSON(data, {
+            style: (feature) => VectorRiverLayer.getBorderStyle(feature, 9),
+            pane: pane
+        });
+        (border as any).riverType = 'border'; // Tag for updates
+
+        // 2. Water Layer (Top)
+        const water = new L.GeoJSON(data, {
+            style: (feature) => VectorRiverLayer.getWaterStyle(feature, 9),
+            pane: pane
+        });
+        (water as any).riverType = 'water'; // Tag for updates
+
+        group.addLayer(border);
+        group.addLayer(water);
+
+        return group;
+    }
+
+    /**
+     * [OPTIMIZED] 极速切换坐标系
+     * 简单的图层移除/添加，无计算，无重建。
+     * @param enable - true = GCJ02 (offset), false = WGS84 (standard)
+     * @param force - force refresh even if mode hasn't changed
+     */
+    public setOffsetMode(enable: boolean, force: boolean = false) {
+        if (!force && this.currentOffsetMode === enable) return;
         this.currentOffsetMode = enable;
 
-        // Determine data source
-        let targetData = this.originalData;
+        // Fast Switch
+        this.clearLayers(); // Remove current visible
+
         if (enable) {
-            targetData = VectorRiverLayer.applyGCJ02Offset(this.originalData);
+            // Show GCJ-02 (Offset)
+            this.addLayer(this.gcj02Group);
+        } else {
+            // Show WGS-84 (Standard)
+            this.addLayer(this.wgs84Group);
         }
-
-        // Update both layers
-        this.borderLayer.clearLayers();
-        this.borderLayer.addData(targetData);
-
-        this.waterLayer.clearLayers();
-        this.waterLayer.addData(targetData);
     }
 
     /**
-     * Update dynamic styles for both layers
+     * Force refresh the layer rendering.
+     * Call this after re-adding to the map to ensure proper layer order.
+     */
+    public refresh() {
+        this.clearLayers();
+        if (this.currentOffsetMode) {
+            this.addLayer(this.gcj02Group);
+        } else {
+            this.addLayer(this.wgs84Group);
+        }
+    }
+
+    /**
+     * Update dynamic styles for BOTH groups (Background & Foreground)
+     * 确保切换过去时样式也是正确的。
      */
     public updateStyle(zoom: number) {
-        this.borderLayer.setStyle((feature) => VectorRiverLayer.getBorderStyle(feature, zoom));
-        this.waterLayer.setStyle((feature) => VectorRiverLayer.getWaterStyle(feature, zoom));
+        const updateGroup = (group: L.FeatureGroup) => {
+            group.eachLayer((layer: any) => {
+                if (layer.riverType === 'border') {
+                    layer.setStyle((feature: any) => VectorRiverLayer.getBorderStyle(feature, zoom));
+                } else if (layer.riverType === 'water') {
+                    layer.setStyle((feature: any) => VectorRiverLayer.getWaterStyle(feature, zoom));
+                }
+            });
+        };
+
+        updateGroup(this.wgs84Group);
+        updateGroup(this.gcj02Group);
     }
 
     // --- Styling Logic ---
 
     // 1. Water Style (Inner Blue)
     private static getWaterStyle(feature: any, zoom: number): L.PathOptions {
-        // [USER REQUEST] 统一使用用户指定颜色 (#7BA4C4)
         const uniformColor = '#7BA4C4';
-
         let scaleMultiplier = VectorRiverLayer.getScaleMultiplier(zoom);
-        let baseWeight = 3.0; // Base width for "Uniform" look
+        let baseWeight = 3.0;
 
         let weight = baseWeight * scaleMultiplier;
-        weight = Math.max(weight, 1.5); // Min width
+        weight = Math.max(weight, 1.5);
 
         return {
             color: uniformColor,
             weight: weight,
-            opacity: 1.0,  // Opaque water
+            opacity: 1.0,
             lineCap: 'round',
             lineJoin: 'round',
             className: 'vector-river-water'
@@ -104,14 +146,9 @@ export class VectorRiverLayer extends L.FeatureGroup {
 
     // 2. Border Style (Outer Dark/Black)
     private static getBorderStyle(feature: any, zoom: number): L.PathOptions {
-        // Dark color for the "Black Border"
-        const borderColor = '#2C3E50'; // Deep Blue-Black
-
+        const borderColor = '#2C3E50';
         let scaleMultiplier = VectorRiverLayer.getScaleMultiplier(zoom);
         let baseWeight = 3.0;
-
-        // Border needs to be WIDER than water
-        // [USER REQUEST] "都是1" -> Constant 1px total difference (0.5px on each side)
         let waterWeight = Math.max(baseWeight * scaleMultiplier, 1.5);
         let borderWeight = waterWeight + 1.0;
 
@@ -155,9 +192,6 @@ export class VectorRiverLayer extends L.FeatureGroup {
         };
 
         const wgs2gcj = (lng: number, lat: number): [number, number] => {
-            // [FIX] Restrict Offset to Local Tile Area ONLY (Xi'an / Guanzhong Region)
-            // Local Tiles Coverage: ~103° to 115° E, ~29° to 39° N
-            // Outside this box, we use ESRI (WGS-84), so NO offset should be applied.
             if (lng < 103.0 || lng > 115.0 || lat < 29.0 || lat > 39.0) {
                 return [lng, lat];
             }
@@ -172,37 +206,13 @@ export class VectorRiverLayer extends L.FeatureGroup {
             return [lng + dLon, lat + dLat];
         };
 
-        // Deep clone to avoid mutating original if reused
         const newData = JSON.parse(JSON.stringify(geojson));
 
-        // Recursive coordinate transformer
-        const processCoords = (coords: any) => {
-            if (Array.isArray(coords[0])) {
-                // LineString or Polygon rings
-                if (typeof coords[0][0] === 'number') {
-                    // Single point in array [lng, lat]
-                    const [lng, lat] = coords as [number, number];
-                    const [gLng, gLat] = wgs2gcj(lng, lat);
-                    coords[0] = gLng;
-                    coords[1] = gLat;
-                } else {
-                    // Array of points
-                    for (const c of coords) {
-                        processCoords(c);
-                    }
-                }
-            }
-        };
-
-        // Handle FeatureCollection
         if (newData.type === 'FeatureCollection') {
             for (const feature of newData.features) {
                 if (feature.geometry && feature.geometry.coordinates) {
-                    // GeoJSON coordinates are usually nested arrays.
-                    // Using a smarter recursion to handle any depth
                     const traverse = (arr: any[]) => {
                         if (arr.length >= 2 && typeof arr[0] === 'number') {
-                            // Hit a coordinate pair
                             const [lng, lat] = wgs2gcj(arr[0], arr[1]);
                             arr[0] = lng;
                             arr[1] = lat;

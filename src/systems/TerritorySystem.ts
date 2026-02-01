@@ -873,77 +873,8 @@ export class TerritorySystem {
         paneName: string,
         targetTerritoryGroup: L.LayerGroup
     ) {
-        const factionBorderSegments: L.LatLng[][] = [];
-        const ribbonQuads: L.LatLng[][] = []; // For storing Inward Glow Ribbons
-        const neighborDirs = [
-            { q: 1, r: 0 }, { q: 1, r: -1 }, { q: 0, r: -1 },
-            { q: -1, r: 0 }, { q: -1, r: 1 }, { q: 0, r: 1 }
-        ];
-        // Direction to edge mapping
-        const dirToEdge: { [key: number]: [number, number] } = {
-            0: [0, 1], 1: [5, 0], 2: [4, 5], 3: [3, 4], 4: [2, 3], 5: [1, 2]
-        };
-
-        hexes.forEach(h => {
-            const center = GridSystem.axialToLatLng(h.q, h.r);
-            const corners = GridSystem.getHexagonCorners(center);
-
-            for (let i = 0; i < 6; i++) {
-                const nq = h.q + neighborDirs[i].q;
-                const nr = h.r + neighborDirs[i].r;
-                const neighborKey = GridSystem.getSpatialKey(nq, nr);
-
-                const neighborCity = hexOwnership.get(neighborKey);
-                if (neighborCity && neighborCity.factionId !== factionId) {
-                    const [c1Idx, c2Idx] = dirToEdge[i];
-                    const c1 = corners[c1Idx];
-                    const c2 = corners[c2Idx];
-                    factionBorderSegments.push([L.latLng(c1), L.latLng(c2)]);
-
-                    // Calculate Glow Ribbon Quad (Inward extension)
-                    // Project c1 and c2 towards the center by 40% (Widened from 25%)
-                    const innerC1 = {
-                        lat: c1.lat + (center.lat - c1.lat) * 0.40,
-                        lng: c1.lng + (center.lng - c1.lng) * 0.40
-                    };
-                    const innerC2 = {
-                        lat: c2.lat + (center.lat - c2.lat) * 0.40,
-                        lng: c2.lng + (center.lng - c2.lng) * 0.40
-                    };
-                    // Quad: c1 -> c2 -> innerC2 -> innerC1
-                    ribbonQuads.push([
-                        L.latLng(c1), L.latLng(c2), L.latLng(innerC2), L.latLng(innerC1)
-                    ]);
-                }
-            }
-        });
-
-        if (factionBorderSegments.length > 0) {
-            // 1. Glow Ribbons (Inward-projected quads, visible at Zoom 9)
-            // Rendered FIRST so they are BEHIND the black border line
-            if (ribbonQuads.length > 0) {
-                const factionColor = this.factionManager.getFactionColor(factionId);
-                const ribbonPoly = L.polygon(ribbonQuads, {
-                    color: factionColor,
-                    weight: 0,
-                    fillColor: factionColor,
-                    fillOpacity: 0.6,
-                    interactive: false,
-                    pane: paneName,
-                    className: 'glow-ribbon' // For CSS Blur
-                });
-                (ribbonPoly as any).isGlowRibbon = true;
-                (ribbonPoly as any).factionId = factionId;
-                ribbonPoly.addTo(targetTerritoryGroup);
-            }
-
-            // 2. Black Border Line (Always visible, clean sharp line on top)
-            L.polyline(factionBorderSegments, {
-                color: '#000', weight: 2, opacity: 1.0,
-                lineCap: 'round', lineJoin: 'round', interactive: false, pane: paneName
-            }).addTo(targetTerritoryGroup);
-        }
-        this.ensureGlobalStyles();
+        // [REMOVED] Hexagonal faction borders disabled
+        // No border rendering
     }
 
     private ensureGlobalStyles(): void {

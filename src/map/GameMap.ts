@@ -155,10 +155,6 @@ export class GameMap {
             this.currentTileLayer.addTo(this.map);
         }
 
-        // 保持之前的滤镜 - 已移至 TerrainEditor 控制，此处仅负责重置或默认
-        // const chkAncient = document.getElementById('chk-ancient') as HTMLInputElement;
-        // ... (Logic removed from here)
-
         // 保持河流和地形的顺序
         // 1. Base Map (Added above)
         // 2. Hillshade (zIndex 2)
@@ -209,7 +205,41 @@ export class GameMap {
         }
     }
 
+    private isVectorRiverEnabled: boolean = true; // [FIX] Track explicit enabled state
+
+    /**
+     * Centralized visibility logic for Vector River Layer
+     * Strictly controls Zoom 9 visibility.
+     */
+    private updateRiverVisibility = () => {
+        // Safety checks
+        if (!this.vectorRiverLayer || !this.isVectorRiverEnabled) return;
+
+        const zoom = Math.floor(this.map.getZoom());
+        const shouldShow = zoom === 9; // STRICT: Only Zoom 9
+
+        if (shouldShow) {
+            if (!this.map.hasLayer(this.vectorRiverLayer)) {
+                this.vectorRiverLayer.addTo(this.map);
+                this.vectorRiverLayer.bringToBack();
+                // [FIX] Force refresh to ensure both layers render correctly
+                this.vectorRiverLayer.refresh();
+                // Ensure ESRI stays on top
+                if (this.riverLayer) this.riverLayer.bringToFront();
+            }
+            this.vectorRiverLayer.updateStyle(zoom);
+            this.vectorRiverLayer.setOffsetMode(zoom <= 9);
+        } else {
+            if (this.map.hasLayer(this.vectorRiverLayer)) {
+                this.map.removeLayer(this.vectorRiverLayer);
+            }
+        }
+    }
+
     public toggleRiver(enable: boolean) {
+        // [FIX] Always clean up old listener to prevent duplicates/ghosts
+        this.map.off('zoomend', this.updateRiverVisibility);
+
         // [MODIFIED] Keep existing RiverOverlayLayer (ESRI) Logic
         if (this.riverLayer) {
             if ((this.riverLayer as any)._map) {
@@ -220,91 +250,41 @@ export class GameMap {
         }
 
         // [NEW] Toggle Vector Layer logic
+        this.isVectorRiverEnabled = enable;
+
         if (this.vectorRiverLayer) {
             if (this.map.hasLayer(this.vectorRiverLayer)) {
                 this.map.removeLayer(this.vectorRiverLayer);
             }
         }
 
-        // [USER FIXED] 恢复 ESRI 样式，不移除 river-blend-style
-        // const existingStyle = document.getElementById('river-blend-style');
-        // if (existingStyle) {
-        //    existingStyle.remove();
-        // }
-
         if (enable) {
+            // [FIX] Bind listener centrally
+            this.map.on('zoomend', this.updateRiverVisibility);
+
             // 1. Load ESRI Layer (Existing)
             this.riverLayer = new RiverOverlayLayer();
             this.riverLayer.addTo(this.map);
 
             // 2. Load Vector Layer (New Authentic Data)
-            // fetch data if not loaded
             if (!this.vectorRiverLayer) {
-                // [FIX] Use import.meta.env.BASE_URL for Vite compatibility
                 const basePath = import.meta.env.BASE_URL || '/';
                 fetch(`${basePath}assets/ne_10m_rivers_lake_centerlines.geojson`)
                     .then(res => {
-                        if (!res.ok) {
-                            throw new Error(`HTTP ${res.status}`);
-                        }
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
                         return res.json();
                     })
                     .then(data => {
-                        console.log('[GameMap] Vector river data loaded:', data.features?.length || 0, 'features');
-                        // [FIX] Use dedicated pane for proper z-ordering
+                        console.log('[GameMap] Vector river data loaded');
                         this.vectorRiverLayer = new VectorRiverLayer(data, { pane: 'vectorRiverPane' });
-                        // Ensure it's added if 'enable' is still true
-                        // @ts-ignore
-                        if (enable && this.map) {
-                            this.vectorRiverLayer.addTo(this.map);
-                            this.vectorRiverLayer.bringToBack(); // [USER REQUEST] Put below ESRI
-                            console.log('[GameMap] VectorRiverLayer added to map (Behind)');
 
-                            // [NEW] Initial Dynamic Style
-                            const currentZoom = this.map.getZoom();
-                            this.vectorRiverLayer.updateStyle(currentZoom);
-
-                            // [FIX] Apply initial offset mode immediately!
-                            const shouldOffset = currentZoom <= 9;
-                            this.vectorRiverLayer.setOffsetMode(shouldOffset);
-
-                            // [USER REQUEST] Ensure ESRI stays on top
-                            if (this.riverLayer) {
-                                this.riverLayer.bringToFront();
-                            }
-                        }
-
-                        // [NEW] Bind auto-scaling to map zoom
-                        this.map.on('zoomend', () => {
-                            if (!this.vectorRiverLayer) return;
-                            const zoom = this.map.getZoom();
-
-                            // [USER REQUEST] Only show in Zoom 8-9-10
-                            const shouldShow = zoom >= 8 && zoom <= 10;
-
-                            if (shouldShow) {
-                                if (!this.map.hasLayer(this.vectorRiverLayer)) {
-                                    this.vectorRiverLayer.addTo(this.map);
-                                    this.vectorRiverLayer.bringToBack();
-                                    if (this.riverLayer) this.riverLayer.bringToFront();
-                                }
-                                this.vectorRiverLayer.updateStyle(zoom);
-                                // Offset: ON for 8-9, OFF for 10
-                                this.vectorRiverLayer.setOffsetMode(zoom <= 9);
-                            } else {
-                                if (this.map.hasLayer(this.vectorRiverLayer)) {
-                                    this.map.removeLayer(this.vectorRiverLayer);
-                                }
-                            }
-                        });
-
-                        // [FIX] Trigger initial visibility check
-                        this.map.fire('zoomend');
+                        // [FIX] Initial Visibility Check
+                        this.updateRiverVisibility();
                     })
                     .catch(err => console.error('[GameMap] Failed to load vector rivers:', err));
             } else {
-                // [FIX] Let zoomend listener handle visibility (Zoom 8-10 only)
-                this.map.fire('zoomend');
+                // [FIX] Initial Visibility Check for existing layer
+                this.updateRiverVisibility();
             }
         }
     }
@@ -318,8 +298,6 @@ export class GameMap {
             tilesPane.style.filter = 'none';
         }
     }
-
-    // private addStyleControl() { ... } // REMOVED
 
     public getLeafletMap(): L.Map {
         return this.map;
@@ -378,4 +356,3 @@ export class GameMap {
         }, 100);
     }
 }
-
