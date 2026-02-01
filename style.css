@@ -188,7 +188,8 @@ body {
     bottom: 20px;
     z-index: 1100;
     /* Above HUD (1000) */
-    pointer-events: none; /* Default no interaction for container */
+    pointer-events: none;
+    /* Default no interaction for container */
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -1262,7 +1263,7 @@ path.npc-hitbox {
     overflow-y: auto;
     padding-right: 20px;
     padding-left: 5px;
-    pointer-events: auto;
+    pointer-events: none;
 
     /* Fade out bottom */
     mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
@@ -1284,6 +1285,7 @@ path.npc-hitbox {
     border-left: 2px solid rgba(62, 43, 29, 0.2);
     padding-left: 20px;
     transform-origin: left center;
+    pointer-events: auto;
 }
 
 .chronicle-item:hover {
@@ -1363,6 +1365,7 @@ path.npc-hitbox {
     cursor: pointer;
     transition: all 0.3s ease;
     border-radius: 0 4px 4px 0;
+    pointer-events: auto;
 }
 
 .year-header:hover {
@@ -1657,10 +1660,14 @@ path.npc-hitbox {
 /* Faction Status Panel Styles */
 .faction-status-panel {
     position: fixed;
-    left: 20px;       /* [FIX] Move to Left */
-    bottom: 20px;     /* [FIX] Move to Bottom */
-    right: auto;      /* Reset Right */
-    top: auto;        /* Reset Top */
+    left: 20px;
+    /* [FIX] Move to Left */
+    bottom: 20px;
+    /* [FIX] Move to Bottom */
+    right: auto;
+    /* Reset Right */
+    top: auto;
+    /* Reset Top */
     /* Below Notification Area - Not needed anymore */
     z-index: 2000;
     /* [FIX] Higher than all map layers */
@@ -1674,7 +1681,8 @@ path.npc-hitbox {
     /* Fixed width */
     pointer-events: auto;
     /* [FIX] Ensure interactive */
-    max-height: 60vh; /* Dynamic max height based on viewport */
+    max-height: 60vh;
+    /* Dynamic max height based on viewport */
     display: flex;
     flex-direction: column;
 }
@@ -1683,8 +1691,10 @@ path.npc-hitbox {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    left: 20px;       /* [FIX] Keep at Left */
-    bottom: 20px;     /* [FIX] Keep at Bottom */
+    left: 20px;
+    /* [FIX] Keep at Left */
+    bottom: 20px;
+    /* [FIX] Keep at Bottom */
     right: auto;
     top: auto;
 }

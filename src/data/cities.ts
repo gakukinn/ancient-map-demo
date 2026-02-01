@@ -77,7 +77,7 @@ export const CITIES: CityData[] = [
   // --- 中原与西北 ---
   { id: 'city_ankang', name: '西城', factionId: 'panjun', lat: 32.68, lng: 109.02, type: 'large_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_langya', name: '琅琊', factionId: 'panjun', lat: 35.10, lng: 118.35, type: 'large_city', troops: 10000 },
-  { id: 'city_baidicheng', name: '白帝城', factionId: 'panjun', lat: 31.04, lng: 109.57, type: 'large_city', troops: 10000 },
+  { id: 'city_baidicheng', name: '白帝城', factionId: 'panjun', lat: 31.040000, lng: 109.570000, type: 'large_city', troops: 10000, mirror: true },
   { id: 'city_baotou', name: '九原', factionId: 'panjun', lat: 40.60, lng: 109.83, type: 'large_city', troops: 10000 },
   { id: 'city_bozhou', name: '谯县', factionId: 'panjun', lat: 33.85, lng: 115.77, type: 'large_city', troops: 10000 },
   { id: 'city_buhala', name: '布哈拉', factionId: 'panjun', lat: 39.77, lng: 64.42, type: 'large_city', region: 'WEST', troops: 10000 },
@@ -105,13 +105,13 @@ export const CITIES: CityData[] = [
   { id: 'city_hejian', name: '河间', factionId: 'panjun', lat: 38.29, lng: 116.84, type: 'large_city', troops: 10000, mirror: true },
   { id: 'city_huaian', name: '淮安', factionId: 'panjun', lat: 33.60, lng: 119.02, type: 'large_city', troops: 10000, mirror: true },
   { id: 'city_huanglongfu', name: '黄龙府', factionId: 'panjun', lat: 44.41, lng: 125.18, type: 'large_city', troops: 10000 },
-  { id: 'city_jianghu', name: '江户', factionId: 'panjun', lat: 35.69, lng: 139.69, type: 'large_city', region: 'JAPAN', troops: 10000 },
-  { id: 'city_jiangyang', name: '江阳', factionId: 'panjun', lat: 28.87, lng: 105.44, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_jianghu', name: '江户', factionId: 'panjun', lat: 35.690000, lng: 139.690000, type: 'small_city', region: 'JAPAN', troops: 10000 },
+  { id: 'city_jiangyang', name: '江阳', factionId: 'panjun', lat: 28.870000, lng: 105.440000, type: 'ferry', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_jiujiang', name: '柴桑', factionId: 'panjun', lat: 29.65, lng: 115.99, type: 'large_city', mirror: true },
   { id: 'city_julu', name: '巨鹿', factionId: 'panjun', lat: 37.01, lng: 115.02, type: 'large_city', troops: 10000, mirror: true },
-  { id: 'city_junfu', name: '骏府', factionId: 'panjun', lat: 34.97, lng: 138.38, type: 'large_city', region: 'JAPAN', troops: 10000 },
+  { id: 'city_junfu', name: '骏府', factionId: 'panjun', lat: 34.970000, lng: 138.380000, type: 'small_city', region: 'JAPAN', troops: 10000 },
   { id: 'city_kunming', name: '谷昌', factionId: 'panjun', lat: 25.04, lng: 102.71, type: 'large_city', troops: 10000, mirror: true },
-  { id: 'city_langzhong', name: '阆中', factionId: 'panjun', lat: 31.58, lng: 105.96, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_langzhong', name: '阆中', factionId: 'panjun', lat: 31.580000, lng: 105.960000, type: 'ferry', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_lanzhou', name: '金城', factionId: 'panjun', lat: 36.06, lng: 103.83, type: 'large_city', troops: 10000 },
   { id: 'city_liaoyang', name: '襄平', factionId: 'panjun', lat: 41.27, lng: 123.17, type: 'large_city', region: 'NORTH', troops: 10000 },
   { id: 'city_linfen', name: '平阳', factionId: 'panjun', lat: 36.24, lng: 111.63, type: 'large_city', troops: 10000, mirror: true },
@@ -131,7 +131,7 @@ export const CITIES: CityData[] = [
   // --- Large Cities 续批 (中亚、西域、中原补全) ---
   { id: 'city_quancheng', name: '历城', factionId: 'panjun', lat: 36.66, lng: 117.00, type: 'large_city', troops: 10000 }, // 济南古称
   { id: 'city_quanzhou', name: '泉州', factionId: 'panjun', lat: 24.89, lng: 118.59, type: 'large_city', troops: 10000 },
-  { id: 'city_qujing', name: '建宁', factionId: 'panjun', lat: 25.48, lng: 103.80, type: 'large_city', region: 'CHU_SHU', troops: 10000 }, // 诸葛亮南征重要据点
+  { id: 'city_qujing', name: '建宁', factionId: 'panjun', lat: 25.480000, lng: 103.800000, type: 'ferry', region: 'CHU_SHU', troops: 10000 }, // 诸葛亮南征重要据点
   { id: 'city_rayy', name: '雷伊', factionId: 'panjun', lat: 35.60, lng: 51.44, type: 'large_city', region: 'WEST', troops: 10000 },
   { id: 'city_rikaze', name: '日喀则', factionId: 'panjun', lat: 29.27, lng: 88.88, type: 'large_city', troops: 10000, mirror: true },
   { id: 'city_samarhan', name: '撒马尔罕', factionId: 'panjun', lat: 39.65, lng: 66.97, type: 'large_city', region: 'WEST', troops: 10000 },
@@ -142,7 +142,7 @@ export const CITIES: CityData[] = [
   { id: 'city_suizhou', name: '汉东', factionId: 'panjun', lat: 31.78, lng: 113.17, type: 'large_city', troops: 10000 },
   { id: 'city_suoche', name: '莎车', factionId: 'panjun', lat: 38.42, lng: 77.24, type: 'large_city', troops: 10000 },
   { id: 'city_tabriz', name: '桃里寺', factionId: 'panjun', lat: 38.07, lng: 46.29, type: 'large_city', region: 'WEST', troops: 10000 },
-  { id: 'city_taizaifu', name: '太宰府', factionId: 'panjun', lat: 33.51, lng: 130.52, type: 'large_city', troops: 10000 },
+  { id: 'city_taizaifu', name: '太宰府', factionId: 'panjun', lat: 33.400000, lng: 130.520000, type: 'large_city', troops: 10000, mirror: true },
   { id: 'city_tbilisi', name: '第比利斯', factionId: 'panjun', lat: 41.71, lng: 44.83, type: 'large_city', region: 'WEST', troops: 10000 },
   { id: 'city_tongwancheng', name: '统万城', factionId: 'panjun', lat: 37.86, lng: 108.62, type: 'large_city', region: 'NORTHWEST', troops: 10000, mirror: true }, // 大夏国首都
   { id: 'city_urgench', name: '玉龙杰赤', factionId: 'panjun', lat: 42.33, lng: 59.15, type: 'large_city', region: 'WEST', troops: 10000 },
@@ -174,27 +174,27 @@ export const CITIES: CityData[] = [
 
   { id: 'city_aihui', name: '黑龙江城', factionId: 'panjun', lat: 50.24, lng: 127.53, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_ali', name: '列城', factionId: 'panjun', lat: 34.17, lng: 77.57, type: 'small_city', region: 'WEST', troops: 10000 }, // 修正坐标至列城中心
-  { id: 'city_amul', name: '阿姆河渡', factionId: 'panjun', lat: 38.95, lng: 63.83, type: 'small_city', region: 'WEST', troops: 10000 },
+  { id: 'city_amul', name: '阿姆河渡', factionId: 'panjun', lat: 38.950000, lng: 63.830000, type: 'ferry', troops: 10000 },
   { id: 'city_anshi', name: '安市', factionId: 'panjun', lat: 40.85, lng: 122.75, type: 'small_city', region: 'KOREA', troops: 10000 },
   { id: 'city_anzhou', name: '萨水', factionId: 'panjun', lat: 39.62, lng: 125.66, type: 'small_city', region: 'KOREA', troops: 10000 },
   { id: 'city_baima', name: '白马', factionId: 'panjun', lat: 35.51, lng: 114.50, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_baixiang', name: '柏乡', factionId: 'panjun', lat: 37.48, lng: 114.73, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
 
 
-  { id: 'city_bangyuandong', name: '帮源洞', factionId: 'panjun', lat: 29.58, lng: 118.95, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_bangyuandong', name: '帮源洞', factionId: 'panjun', lat: 29.580000, lng: 118.950000, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_baohan', name: '枹罕', factionId: 'panjun', lat: 35.610000, lng: 103.240000, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_baoji', name: '陈仓', factionId: 'panjun', lat: 34.43, lng: 107.23, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_bayanxile', name: '巴彦锡勒', factionId: 'panjun', lat: 43.93, lng: 116.08, type: 'small_city', troops: 10000 },
   { id: 'city_bayinbuluke', name: '巴音布鲁克', factionId: 'panjun', lat: 42.89, lng: 84.21, type: 'small_city', region: 'NOMADIC', troops: 10000, mirror: true },
-  { id: 'city_bianpu', name: '乌沙堡', factionId: 'panjun', lat: 41.27, lng: 113.52, type: 'small_city', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_bianpu', name: '乌沙堡', factionId: 'panjun', lat: 41.270000, lng: 113.520000, type: 'pass', region: 'NOMADIC', troops: 10000 },
   { id: 'city_bodongqi', name: '博东奇', factionId: 'panjun', lat: 46.55, lng: 92.10, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_boli', name: '剖阿里', factionId: 'panjun', lat: 48.48, lng: 135.09, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_bulgan_gobi', name: '布尔干', factionId: 'panjun', lat: 46.08, lng: 91.55, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_buyurhai', name: '捕鱼儿海', factionId: 'panjun', lat: 47.91, lng: 117.70, type: 'small_city', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_buyurhai', name: '捕鱼儿海', factionId: 'panjun', lat: 47.910000, lng: 117.700000, type: 'ferry', region: 'NOMADIC', troops: 10000, mirror: true },
   { id: 'city_caishiji', name: '采石矶', factionId: 'panjun', lat: 31.65, lng: 118.42, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_cangting', name: '仓亭', factionId: 'panjun', lat: 36.31, lng: 115.98, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
 
-  { id: 'city_changbaishan_sd', name: '长白山', factionId: 'panjun', lat: 36.88, lng: 117.71, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
+  { id: 'city_changbaishan_sd', name: '长白山', factionId: 'panjun', lat: 36.880000, lng: 117.710000, type: 'large_city', region: 'CHU_SHU', troops: 10000, mirror: true },
   { id: 'city_changban', name: '长坂', factionId: 'panjun', lat: 30.82, lng: 111.78, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_changting', name: '长汀', factionId: 'panjun', lat: 25.67, lng: 116.33, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_chaozhou', name: '潮州', factionId: 'panjun', lat: 23.45, lng: 116.64, type: 'small_city', troops: 10000, mirror: true },
@@ -205,36 +205,36 @@ export const CITIES: CityData[] = [
   { id: 'city_chikanlou', name: '赤崁楼', factionId: 'panjun', lat: 23.00, lng: 120.18, type: 'small_city', region: 'LINGNAN', troops: 10000 },
 
   { id: 'city_chongzuo', name: '临尘', factionId: 'panjun', lat: 22.49, lng: 107.33, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_dabancheng', name: '达坂城', factionId: 'panjun', lat: 43.56, lng: 88.40, type: 'small_city', region: 'WESTERN', troops: 10000, mirror: true },
-  { id: 'city_dagu', name: '大沽口', factionId: 'panjun', lat: 38.980000, lng: 117.700000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true },
+  { id: 'city_dabancheng', name: '达坂城', factionId: 'panjun', lat: 43.560000, lng: 88.400000, type: 'pass', region: 'WESTERN', troops: 10000, mirror: true },
+  { id: 'city_dagu', name: '大沽口', factionId: 'panjun', lat: 38.980000, lng: 117.700000, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_dajie', name: '大界', factionId: 'panjun', lat: 35.03, lng: 108.08, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_dalanbaljut', name: '答阑巴勒主惕', factionId: 'panjun', lat: 47.85, lng: 108.80, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_dalanzhuer', name: '答兰纳儿河', factionId: 'panjun', lat: 46.50, lng: 115.00, type: 'small_city', region: 'NOMADIC', troops: 10000 },
 
   { id: 'city_damghan', name: '达姆甘', factionId: 'panjun', lat: 36.16, lng: 54.35, type: 'small_city', region: 'WEST', troops: 10000 },
-  { id: 'city_dangqu', name: '宕渠', factionId: 'panjun', lat: 31.02, lng: 106.97, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_dangshan', name: '砀山', factionId: 'panjun', lat: 34.44, lng: 116.47, type: 'small_city', troops: 10000 },
+  { id: 'city_dangqu', name: '宕渠', factionId: 'panjun', lat: 31.020000, lng: 106.970000, type: 'ferry', region: 'CHU_SHU', troops: 10000, mirror: true },
+  { id: 'city_dangshan', name: '砀山', factionId: 'panjun', lat: 34.440000, lng: 116.470000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_dangxiong', name: '当雄', factionId: 'panjun', lat: 30.47, lng: 91.10, type: 'small_city', troops: 10000 },
   { id: 'city_wushengguan', name: '武胜关', factionId: 'panjun', lat: 31.91, lng: 114.11, type: 'pass', region: 'CENTRAL', troops: 10000 },
   { id: 'city_dehancheng', name: '得汉城', factionId: 'panjun', lat: 32.08, lng: 107.45, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
 
   { id: 'city_derbent', name: '杰尔宾特', factionId: 'panjun', lat: 42.06, lng: 48.29, type: 'small_city', region: 'WEST', troops: 10000 },
-  { id: 'city_dingjiazhou', name: '丁家洲', factionId: 'panjun', lat: 30.93, lng: 117.70, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_dingjiazhou', name: '丁家洲', factionId: 'panjun', lat: 30.930000, lng: 117.700000, type: 'ferry', region: 'SOUTH', troops: 10000, mirror: true },
   { id: 'city_duanshi', name: '长平', factionId: 'panjun', lat: 35.79, lng: 112.92, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_duima', name: '对马', factionId: 'panjun', lat: 34.20, lng: 129.29, type: 'small_city', region: 'JAPAN', troops: 10000 },
+  { id: 'city_duima', name: '对马', factionId: 'panjun', lat: 34.200000, lng: 129.290000, type: 'ferry', region: 'JAPAN', troops: 10000, mirror: true },
   { id: 'city_eerduosi', name: '河曲', factionId: 'panjun', lat: 39.62, lng: 109.59, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_eyu', name: '阏与', factionId: 'panjun', lat: 37.05, lng: 113.15, type: 'small_city', troops: 10000 },
   { id: 'city_fengcheng', name: '凤城', factionId: 'panjun', lat: 40.45, lng: 124.07, type: 'small_city', region: 'KOREA', troops: 10000 },
-  { id: 'city_fenghuangshan', name: '凤凰山', factionId: 'panjun', lat: 31.02, lng: 105.88, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_fenghuangshan', name: '凤凰山', factionId: 'panjun', lat: 31.020000, lng: 105.880000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_fucheng', name: '涪城', factionId: 'panjun', lat: 31.41, lng: 104.70, type: 'small_city', troops: 10000 },
   { id: 'city_fuliji', name: '符离', factionId: 'panjun', lat: 33.78, lng: 117.02, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_fushan', name: '东莱', factionId: 'panjun', lat: 35.18, lng: 129.07, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_fushan', name: '东莱', factionId: 'panjun', lat: 35.180000, lng: 129.070000, type: 'ferry', region: 'KOREA', troops: 10000 },
   { id: 'city_fuzhou_2', name: '雕阴', factionId: 'panjun', lat: 35.80, lng: 109.41, type: 'small_city', troops: 10000 },
   { id: 'city_gaixia', name: '垓下', factionId: 'panjun', lat: 33.45, lng: 117.58, type: 'small_city', troops: 10000 },
 
   { id: 'city_gaoyueyuan', name: '高越原', factionId: 'panjun', lat: 38.62, lng: 103.08, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_golmud', name: '格尔木', factionId: 'panjun', lat: 36.38, lng: 94.85, type: 'small_city', region: 'TIBET', troops: 10000 },
-  { id: 'city_gonglusai', name: '望舒原', factionId: 'panjun', lat: 47.31, lng: 110.61, type: 'small_city', troops: 10000 },
+  { id: 'city_gonglusai', name: '望舒原', factionId: 'panjun', lat: 47.310000, lng: 110.610000, type: 'ferry', troops: 10000, mirror: true },
   { id: 'city_guangdao', name: '广岛', factionId: 'panjun', lat: 34.40, lng: 132.46, type: 'small_city', region: 'JAPAN', troops: 10000 },
   { id: 'city_guanzhai', name: '官寨', factionId: 'panjun', lat: 31.00, lng: 102.37, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_hailongtun', name: '海龙囤', factionId: 'panjun', lat: 27.82, lng: 106.83, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
@@ -243,43 +243,43 @@ export const CITIES: CityData[] = [
   { id: 'city_haizhou_song', name: '海州', factionId: 'panjun', lat: 34.60, lng: 119.12, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_hanan', name: '汉安', factionId: 'panjun', lat: 29.66, lng: 104.92, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_hezhou', name: '贺州', factionId: 'panjun', lat: 24.37, lng: 111.36, type: 'small_city', troops: 10000 },
-  { id: 'city_hongyanchi', name: '红盐池', factionId: 'panjun', lat: 39.30, lng: 108.50, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_huaiyuan', name: '怀远', factionId: 'panjun', lat: 32.92, lng: 117.28, type: 'small_city', troops: 10000 },
+  { id: 'city_hongyanchi', name: '红盐池', factionId: 'panjun', lat: 39.300000, lng: 108.500000, type: 'ferry', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_huaiyuan', name: '怀远', factionId: 'panjun', lat: 32.920000, lng: 117.280000, type: 'ferry', region: 'SOUTH', troops: 10000, mirror: true },
 
   { id: 'city_hubudagang', name: '护步达冈', factionId: 'panjun', lat: 44.82, lng: 127.15, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_huma', name: '呼玛', factionId: 'panjun', lat: 51.72, lng: 126.65, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_itil', name: '亦的勒', factionId: 'panjun', lat: 46.35, lng: 48.05, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_jian', name: '吉安', factionId: 'panjun', lat: 27.09, lng: 114.96, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_jiangtou', name: '江头城', factionId: 'panjun', lat: 24.18, lng: 96.33, type: 'small_city', region: 'LINGNAN', troops: 10000 },
-  { id: 'city_jieqiao', name: '界桥', factionId: 'panjun', lat: 36.98, lng: 115.42, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_jieting', name: '街亭', factionId: 'panjun', lat: 35.03, lng: 105.90, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_jilu', name: '姬路', factionId: 'panjun', lat: 34.84, lng: 134.69, type: 'small_city', region: 'JAPAN', troops: 10000 },
-  { id: 'city_jingjue', name: '精绝', factionId: 'panjun', lat: 37.11, lng: 82.73, type: 'small_city', troops: 10000 },
+  { id: 'city_jiangtou', name: '江头城', factionId: 'panjun', lat: 24.180000, lng: 96.330000, type: 'ferry', region: 'LINGNAN', troops: 10000 },
+  { id: 'city_jieqiao', name: '界桥', factionId: 'panjun', lat: 36.980000, lng: 115.420000, type: 'ferry', region: 'NORTH', troops: 10000 },
+  { id: 'city_jieting', name: '街亭', factionId: 'panjun', lat: 35.030000, lng: 105.900000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_jilu', name: '姬路', factionId: 'panjun', lat: 34.840000, lng: 134.690000, type: 'large_city', region: 'JAPAN', troops: 10000 },
+  { id: 'city_jingjue', name: '精绝', factionId: 'panjun', lat: 37.110000, lng: 82.730000, type: 'pass', troops: 10000 },
   { id: 'city_jingzhou_2', name: '镡城', factionId: 'panjun', lat: 26.56, lng: 109.57, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_jinhua', name: '金华', factionId: 'panjun', lat: 29.11, lng: 119.65, type: 'small_city', troops: 10000 },
 
   { id: 'city_jintian', name: '金田', factionId: 'panjun', lat: 23.23, lng: 110.05, type: 'small_city', region: 'LINGNAN', troops: 10000 },
   { id: 'city_jinxiang', name: '金乡', factionId: 'panjun', lat: 35.07, lng: 116.32, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_jinzhou_ming', name: '锦州', factionId: 'panjun', lat: 41.12, lng: 121.13, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_jiugongshan', name: '九宫山', factionId: 'panjun', lat: 29.40, lng: 114.65, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_jiugongshan', name: '九宫山', factionId: 'panjun', lat: 29.400000, lng: 114.650000, type: 'large_city', region: 'CHU_SHU', troops: 10000, mirror: true },
   { id: 'city_jiuguo', name: '敖东', factionId: 'panjun', lat: 43.36, lng: 128.24, type: 'small_city', region: 'KOREA', troops: 10000 },
   { id: 'city_suoyang', name: '锁阳', factionId: 'panjun', lat: 40.52, lng: 95.78, type: 'small_city', region: 'NORTHWEST', troops: 10000, mirror: true },
   { id: 'city_juyanhai', name: '居延海', factionId: 'panjun', lat: 42.40, lng: 100.70, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_juye', name: '昌邑', factionId: 'panjun', lat: 35.39, lng: 116.06, type: 'small_city', troops: 10000 },
   { id: 'city_kalka', name: '卡尔卡河', factionId: 'panjun', lat: 47.10, lng: 37.55, type: 'small_city', region: 'WEST', troops: 10000 },
-  { id: 'city_kanglangshan', name: '康郎山', factionId: 'panjun', lat: 29.02, lng: 116.35, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_kanglangshan', name: '康郎山', factionId: 'panjun', lat: 29.020000, lng: 116.350000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_kebuduo', name: '科布多', factionId: 'panjun', lat: 47.99, lng: 91.63, type: 'small_city', troops: 10000 },
   { id: 'city_kecheng', name: '柯城', factionId: 'panjun', lat: 28.97, lng: 118.85, type: 'small_city', troops: 10000, mirror: true },
 
   { id: 'city_koyiten', name: '阔亦田', factionId: 'panjun', lat: 49.55, lng: 120.50, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_kunyang', name: '昆阳', factionId: 'panjun', lat: 33.62, lng: 113.35, type: 'small_city', troops: 10000 },
   { id: 'city_kuwu', name: '苦兀', factionId: 'panjun', lat: 53.10, lng: 142.10, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
-  { id: 'city_langfang', name: '安次', factionId: 'panjun', lat: 39.52, lng: 116.70, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
+  { id: 'city_langfang', name: '廊坊', factionId: 'panjun', lat: 39.52, lng: 116.70, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_leiwuqi', name: '类乌齐', factionId: 'panjun', lat: 31.22, lng: 96.60, type: 'small_city', troops: 10000 },
   { id: 'city_leuwuwei', name: '勒乌围', factionId: 'panjun', lat: 31.48, lng: 102.05, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_lianyun', name: '连云堡', factionId: 'panjun', lat: 37.00, lng: 73.40, type: 'small_city', region: 'WEST', troops: 10000 },
+  { id: 'city_lianyun', name: '连云堡', factionId: 'panjun', lat: 37.000000, lng: 73.400000, type: 'pass', region: 'TIBET', troops: 10000 },
   { id: 'city_lianzhou', name: '连州', factionId: 'panjun', lat: 24.94, lng: 112.48, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_linlishan', name: '林历山', factionId: 'panjun', lat: 29.93, lng: 117.92, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_linlishan', name: '林历山', factionId: 'panjun', lat: 29.930000, lng: 117.920000, type: 'large_city', region: 'CHU_SHU', troops: 10000, mirror: true },
   { id: 'city_lintun', name: '临屯', factionId: 'panjun', lat: 39.08, lng: 127.51, type: 'small_city', troops: 10000 },
   { id: 'city_longcou', name: '龙凑', factionId: 'panjun', lat: 37.11, lng: 116.48, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
 
@@ -287,15 +287,15 @@ export const CITIES: CityData[] = [
   { id: 'city_lukou', name: '鲁口', factionId: 'panjun', lat: 38.23, lng: 115.75, type: 'small_city', region: 'NORTH', troops: 10000 },
   { id: 'city_luohe', name: '临颍', factionId: 'panjun', lat: 33.80, lng: 113.95, type: 'small_city', troops: 10000 },
 
-  { id: 'city_maduo', name: '玛多', factionId: 'panjun', lat: 34.92, lng: 98.21, type: 'small_city', troops: 10000 },
+  { id: 'city_maduo', name: '玛多', factionId: 'panjun', lat: 34.920000, lng: 98.210000, type: 'ferry', troops: 10000 },
   { id: 'city_manas', name: '玛纳斯', factionId: 'panjun', lat: 44.30, lng: 86.22, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_manjiang', name: '漫江', factionId: 'panjun', lat: 42.15, lng: 127.28, type: 'small_city', region: 'KOREA', troops: 10000 },
   { id: 'city_mingsha', name: '鸣沙', factionId: 'panjun', lat: 37.50, lng: 105.20, type: 'small_city', troops: 10000, mirror: true },
 
-  { id: 'city_muzhou', name: '宁古塔', factionId: 'panjun', lat: 44.50, lng: 130.25, type: 'small_city', region: 'KOREA', troops: 10000 },
+  { id: 'city_muzhou', name: '宁古塔', factionId: 'panjun', lat: 44.500000, lng: 130.250000, type: 'pass', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_nanping', name: '南平', factionId: 'panjun', lat: 26.63, lng: 118.17, type: 'small_city', troops: 10000 },
   { id: 'city_nanpu', name: '南浦', factionId: 'panjun', lat: 30.71, lng: 108.39, type: 'small_city', troops: 10000 },
-  { id: 'city_naqu', name: '索坡', factionId: 'panjun', lat: 31.47, lng: 92.05, type: 'small_city', troops: 10000 },
+  { id: 'city_naqu', name: '索坡', factionId: 'panjun', lat: 31.470000, lng: 92.050000, type: 'ferry', troops: 10000 },
   { id: 'city_nerchinsk', name: '尼布楚', factionId: 'panjun', lat: 51.97, lng: 116.58, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_ningbo', name: '句章', factionId: 'panjun', lat: 29.95, lng: 121.45, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_ninghua', name: '宁化', factionId: 'panjun', lat: 26.25, lng: 116.65, type: 'small_city', troops: 10000, mirror: true },
@@ -304,13 +304,13 @@ export const CITIES: CityData[] = [
   { id: 'city_noryang', name: '露梁海', factionId: 'panjun', lat: 34.92, lng: 127.87, type: 'ferry', troops: 10000 },
   { id: 'city_nuergan', name: '奴儿干', factionId: 'panjun', lat: 52.94, lng: 139.75, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_old_mangya', name: '老茫崖', factionId: 'panjun', lat: 38.20, lng: 90.50, type: 'small_city', region: 'TIBET', troops: 10000 },
-  { id: 'city_ononhe', name: '斡难河', factionId: 'panjun', lat: 48.25, lng: 110.50, type: 'small_city', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_ononhe', name: '斡难河', factionId: 'panjun', lat: 48.250000, lng: 110.500000, type: 'ferry', region: 'NOMADIC', troops: 10000 },
   { id: 'city_otrar', name: '讹答剌', factionId: 'panjun', lat: 42.85, lng: 68.30, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_paryang', name: '帕羊', factionId: 'panjun', lat: 30.05, lng: 82.96, type: 'small_city', region: 'WEST', troops: 10000 },
 
   { id: 'city_pingliang', name: '平凉', factionId: 'panjun', lat: 35.53, lng: 106.67, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_pingyao', name: '平陶', factionId: 'panjun', lat: 37.20, lng: 112.17, type: 'small_city', troops: 10000 },
-  { id: 'city_pishan', name: '皮山', factionId: 'panjun', lat: 37.61, lng: 78.28, type: 'small_city', troops: 10000, mirror: true },
+  { id: 'city_pishan', name: '皮山', factionId: 'panjun', lat: 37.610000, lng: 78.280000, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_qazvin', name: '加兹温', factionId: 'panjun', lat: 36.27, lng: 50.00, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_qichun', name: '蕲春', factionId: 'panjun', lat: 30.32, lng: 115.57, type: 'small_city', troops: 10000 },
   { id: 'city_qiemi', name: '且弥', factionId: 'panjun', lat: 43.82, lng: 87.61, type: 'small_city', region: 'WESTERN', troops: 10000 },
@@ -320,18 +320,16 @@ export const CITIES: CityData[] = [
   { id: 'city_qishan', name: '武都', factionId: 'panjun', lat: 33.39, lng: 104.92, type: 'small_city', mirror: true },
   { id: 'city_qiting', name: '歧亭', factionId: 'panjun', lat: 31.05, lng: 114.83, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_qu_a', name: '曲阿', factionId: 'panjun', lat: 31.98, lng: 119.58, type: 'small_city', region: 'SOUTH', troops: 10000 },
-  { id: 'city_quli', name: '姑墨', factionId: 'panjun', lat: 41.17, lng: 80.26, type: 'small_city', troops: 10000 },
+  { id: 'city_quli', name: '姑墨', factionId: 'panjun', lat: 41.170000, lng: 80.260000, type: 'ferry', troops: 10000 },
   { id: 'city_rangcheng', name: '穰城', factionId: 'panjun', lat: 32.68, lng: 112.08, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_rongxian', name: '荣县', factionId: 'panjun', lat: 29.45, lng: 104.42, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_ruoqiang', name: '婼羌', factionId: 'panjun', lat: 39.02, lng: 88.16, type: 'small_city', troops: 10000 },
   { id: 'city_rutog', name: '日土宗', factionId: 'panjun', lat: 33.38, lng: 79.73, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_ruxu', name: '濡须', factionId: 'panjun', lat: 31.55, lng: 117.95, type: 'small_city', mirror: true },
-
-  { id: 'city_saga', name: '萨嘎', factionId: 'panjun', lat: 29.32, lng: 85.22, type: 'small_city', region: 'WEST', troops: 10000 },
+  { id: 'city_saga', name: '萨嘎', factionId: 'panjun', lat: 29.320000, lng: 85.220000, type: 'ferry', troops: 10000 },
   { id: 'city_saitula', name: '赛图拉', factionId: 'panjun', lat: 36.41, lng: 78.03, type: 'small_city', region: 'TIBET', troops: 10000 },
-  { id: 'city_sanmishan', name: '三弥山', factionId: 'panjun', lat: 44.52, lng: 84.88, type: 'small_city', region: 'WEST', troops: 10000 },
-  { id: 'city_sarhu', name: '萨尔浒', factionId: 'panjun', lat: 41.88, lng: 124.27, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
-
+  { id: 'city_sanmishan', name: '三弥山', factionId: 'panjun', lat: 44.520000, lng: 84.880000, type: 'pass', troops: 10000 },
+  { id: 'city_sarhu', name: '萨尔浒', factionId: 'panjun', lat: 41.880000, lng: 124.270000, type: 'pass', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_shangyong', name: '上庸', factionId: 'panjun', lat: 32.23, lng: 110.23, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_shayuan', name: '沙苑', factionId: 'panjun', lat: 34.82, lng: 109.95, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_shuaibinfu', name: '率宾府', factionId: 'panjun', lat: 43.79, lng: 131.95, type: 'small_city', region: 'KOREA', troops: 10000 },
@@ -345,47 +343,38 @@ export const CITIES: CityData[] = [
   { id: 'city_talas', name: '恒罗斯', factionId: 'panjun', lat: 42.90, lng: 71.37, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_tiandushan', name: '天都山', factionId: 'panjun', lat: 36.51, lng: 105.52, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_tianmenling', name: '天门岭', factionId: 'panjun', lat: 41.67, lng: 124.67, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
-
   { id: 'city_tongjiang', name: '混同江口', factionId: 'panjun', lat: 47.64, lng: 132.51, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
-
   { id: 'city_ulanbutong', name: '乌兰布通', factionId: 'panjun', lat: 42.58, lng: 117.33, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_ulanude', name: '乌兰乌德', factionId: 'panjun', lat: 51.83, lng: 107.58, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_uliji', name: '乌力吉', factionId: 'panjun', lat: 41.51, lng: 104.10, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-
-  { id: 'city_wankou', name: '皖口', factionId: 'panjun', lat: 30.52, lng: 116.85, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_weichu', name: '威楚', factionId: 'panjun', lat: 25.03, lng: 101.54, type: 'small_city', troops: 10000 },
-  { id: 'city_weili', name: '渠犁', factionId: 'panjun', lat: 41.20, lng: 86.48, type: 'small_city', troops: 10000, mirror: true },
+  { id: 'city_weili', name: '渠犁', factionId: 'panjun', lat: 41.200000, lng: 86.480000, type: 'ferry', troops: 10000 },
   { id: 'city_weitou', name: '尉头', factionId: 'panjun', lat: 39.81, lng: 79.11, type: 'small_city', troops: 10000 },
-  { id: 'city_wensu', name: '温宿', factionId: 'panjun', lat: 41.24, lng: 79.22, type: 'small_city', troops: 10000, mirror: true },
+  { id: 'city_wensu', name: '温宿', factionId: 'panjun', lat: 41.240000, lng: 79.220000, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_wenzhou', name: '鹿城', factionId: 'panjun', lat: 28.00, lng: 120.70, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_wuguocheng', name: '五国城', factionId: 'panjun', lat: 46.29, lng: 129.56, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_wulagai', name: '饶乐水', factionId: 'panjun', lat: 45.71, lng: 118.91, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_wuqiao', name: '吴桥', factionId: 'panjun', lat: 37.63, lng: 116.38, type: 'small_city', region: 'NORTH', troops: 10000 },
-
+  { id: 'city_wulagai', name: '饶乐水', factionId: 'panjun', lat: 45.710000, lng: 118.910000, type: 'ferry', troops: 10000, mirror: true },
+  { id: 'city_wuqiao', name: '吴桥', factionId: 'panjun', lat: 37.630000, lng: 116.380000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_wuyuan', name: '五原', factionId: 'panjun', lat: 40.78, lng: 107.46, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_wuzhangyuan', name: '五丈原', factionId: 'panjun', lat: 34.23, lng: 107.51, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-
+  { id: 'city_wuzhangyuan', name: '五丈原', factionId: 'panjun', lat: 34.230000, lng: 107.510000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_xiangride', name: '香日德', factionId: 'panjun', lat: 36.08, lng: 97.90, type: 'small_city', region: 'TIBET', troops: 10000 },
   { id: 'city_xiangxian', name: '项县', factionId: 'panjun', lat: 33.40, lng: 115.10, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-
-
-  { id: 'city_xiaotianyuan', name: '小田原', factionId: 'panjun', lat: 35.25, lng: 139.15, type: 'small_city', region: 'JAPAN', troops: 10000 },
-  { id: 'city_xiaquyang', name: '晋州', factionId: 'panjun', lat: 38.03, lng: 115.12, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
+  { id: 'city_xiaotianyuan', name: '小田原', factionId: 'panjun', lat: 35.250000, lng: 139.150000, type: 'pass', region: 'JAPAN', troops: 10000, mirror: true },
+  { id: 'city_xiaquyang', name: '晋州', factionId: 'panjun', lat: 38.030000, lng: 115.120000, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_xiaxiang', name: '下相', factionId: 'panjun', lat: 33.96, lng: 118.27, type: 'small_city', troops: 10000 },
-  { id: 'city_xiazhijiang', name: '下沚江', factionId: 'panjun', lat: 29.40, lng: 112.17, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_xiazhijiang', name: '下沚江', factionId: 'panjun', lat: 29.400000, lng: 112.170000, type: 'ferry', region: 'SOUTH', troops: 10000 },
   { id: 'city_xinxiang', name: '牧野', factionId: 'panjun', lat: 35.10, lng: 113.40, type: 'small_city', troops: 10000, mirror: true },
   { id: 'city_xinyang', name: '信阳', factionId: 'panjun', lat: 32.22, lng: 114.14, type: 'small_city', troops: 10000 },
   { id: 'city_xuantu', name: '玄菟', factionId: 'panjun', lat: 39.81, lng: 127.55, type: 'small_city', troops: 10000 },
   { id: 'city_yaksa', name: '雅克萨', factionId: 'panjun', lat: 53.38, lng: 124.08, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_yancheng', name: '雁城', factionId: 'panjun', lat: 26.90, lng: 112.57, type: 'small_city', troops: 10000 },
-
   { id: 'city_yibin', name: '宜宾', factionId: 'panjun', lat: 28.59, lng: 104.72, type: 'small_city', troops: 10000 },
   { id: 'city_yiling', name: '夷陵', factionId: 'panjun', lat: 30.69, lng: 111.28, type: 'small_city', troops: 10000, mirror: true },
-  { id: 'city_diaoyucheng', name: '钓鱼城', factionId: 'panjun', lat: 30.000000, lng: 106.320000, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_diaoyucheng', name: '钓鱼城', factionId: 'panjun', lat: 30.000000, lng: 106.320000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
 
   // --- Small Cities 补完 (Final 17) ---
   { id: 'city_yiwu', name: '伊吾', factionId: 'panjun', lat: 42.83, lng: 93.51, type: 'small_city', region: 'WESTERN', troops: 10000, mirror: true },
-  { id: 'city_yongqiu', name: '雍丘', factionId: 'panjun', lat: 34.52, lng: 114.77, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_yongqiu', name: '雍丘', factionId: 'panjun', lat: 34.520000, lng: 114.770000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_yubi', name: '玉壁', factionId: 'panjun', lat: 35.60, lng: 110.90, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_yulin', name: '榆林', factionId: 'panjun', lat: 38.29, lng: 109.73, type: 'small_city', troops: 10000 },
   { id: 'city_yumi', name: '扜弥', factionId: 'panjun', lat: 36.71, lng: 81.44, type: 'small_city', troops: 10000 },
@@ -400,11 +389,11 @@ export const CITIES: CityData[] = [
   { id: 'city_zhoushui', name: '咒水', factionId: 'panjun', lat: 21.88, lng: 95.95, type: 'small_city', region: 'LINGNAN', troops: 10000 },
   { id: 'city_zhuti', name: '朱提', factionId: 'panjun', lat: 27.33, lng: 103.71, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_zhuya', name: '珠崖', factionId: 'panjun', lat: 19.99, lng: 110.38, type: 'small_city', troops: 10000 },
-  { id: 'city_zimengchuan', name: '紫蒙川', factionId: 'panjun', lat: 43.63, lng: 122.25, type: 'small_city', troops: 10000, mirror: true },
+  { id: 'city_zimengchuan', name: '紫蒙川', factionId: 'panjun', lat: 43.630000, lng: 122.250000, type: 'ferry', troops: 10000, mirror: true },
 
   // ==================== [SECTION 4/5] 关隘 (Passes - Part 1) ====================
   { id: 'city_nanhanshancheng', name: '南汉山城', factionId: 'panjun', lat: 37.48, lng: 127.18, type: 'pass', region: 'KOREA', troops: 10000 },
-  { id: 'city_arjin_pass', name: '阿尔金山', factionId: 'panjun', lat: 38.70, lng: 89.90, type: 'pass', region: 'TIBET', troops: 10000 },
+  { id: 'city_arjin_pass', name: '阿尔金山', factionId: 'panjun', lat: 38.700000, lng: 89.900000, type: 'pass', region: 'TIBET', troops: 10000, mirror: true },
   { id: 'city_bailangshan', name: '白狼山', factionId: 'panjun', lat: 41.22, lng: 119.38, type: 'pass', region: 'NOMADIC', troops: 10000 },
   { id: 'city_biandukou', name: '扁都口', factionId: 'panjun', lat: 38.21, lng: 100.91, type: 'pass', troops: 10000 },
   { id: 'city_chijinxiaguan', name: '赤金峡', factionId: 'panjun', lat: 40.05, lng: 97.23, type: 'pass', troops: 10000, mirror: true },
@@ -414,10 +403,10 @@ export const CITIES: CityData[] = [
   { id: 'city_fenshuiguan_min', name: '分水关', factionId: 'panjun', lat: 27.28, lng: 119.23, type: 'pass', region: 'SOUTH', troops: 10000 },
   { id: 'city_gaoque', name: '高阙', factionId: 'panjun', lat: 41.17, lng: 107.03, type: 'pass', troops: 10000, mirror: true }, // 修正：阴山缺口位置
   { id: 'city_guangchengguan', name: '广成关', factionId: 'panjun', lat: 34.17, lng: 112.84, type: 'pass', troops: 10000, mirror: true },
-  { id: 'city_gulangguan', name: '古浪关', factionId: 'panjun', lat: 37.47, lng: 102.87, type: 'pass', region: 'TIBET', troops: 10000, mirror: true },
+  { id: 'city_gulangguan', name: '古浪关', factionId: 'panjun', lat: 37.470000, lng: 102.870000, type: 'pass', region: 'TIBET', troops: 10000 },
   { id: 'city_guyanguan', name: '严关', factionId: 'panjun', lat: 25.72, lng: 110.88, type: 'pass', troops: 10000 },
   { id: 'city_hanguguan', name: '函谷关', factionId: 'panjun', lat: 34.64, lng: 110.92, type: 'pass', troops: 10000 }, // 修正：秦函谷关
-  { id: 'city_heka_pass', name: '河卡山', factionId: 'panjun', lat: 35.78, lng: 99.50, type: 'pass', region: 'WEST', troops: 10000 },
+  { id: 'city_heka_pass', name: '河卡山', factionId: 'panjun', lat: 35.780000, lng: 99.500000, type: 'small_city', troops: 10000 },
   { id: 'city_hengpuguan', name: '横浦关', factionId: 'panjun', lat: 25.44, lng: 114.39, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_heshangyuan', name: '大散关', factionId: 'panjun', lat: 34.28, lng: 106.98, type: 'pass', region: 'CENTRAL', troops: 10000 },
   { id: 'city_huangxiguan', name: '湟溪关', factionId: 'panjun', lat: 23.91, lng: 113.39, type: 'pass', troops: 10000 },
@@ -445,7 +434,7 @@ export const CITIES: CityData[] = [
   { id: 'city_qifu', name: '岐阜', factionId: 'panjun', lat: 35.42, lng: 136.77, type: 'pass', troops: 10000 }, // 稻叶山
   { id: 'city_raofengguan', name: '饶凤关', factionId: 'panjun', lat: 33.05, lng: 108.18, type: 'pass', region: 'CENTRAL', troops: 10000 },
   { id: 'city_resuoqiao', name: '热索桥', factionId: 'panjun', lat: 28.38, lng: 85.35, type: 'pass', region: 'WEST', troops: 10000 },
-  { id: 'city_riyue_mt', name: '日月山', factionId: 'panjun', lat: 36.35, lng: 101.10, type: 'pass', region: 'TIBET', troops: 10000 },
+  { id: 'city_riyue_mt', name: '日月山', factionId: 'panjun', lat: 36.350000, lng: 101.100000, type: 'small_city', region: 'TIBET', troops: 10000 },
   { id: 'city_shahukou', name: '杀虎口', factionId: 'panjun', lat: 40.24, lng: 112.31, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_shanhaiguan', name: '山海关', factionId: 'panjun', lat: 40.01, lng: 119.75, type: 'pass', troops: 10000 }, // 修正：卡在燕山与海之间
   { id: 'city_shaoguan', name: '韶关', factionId: 'panjun', lat: 24.83, lng: 113.82, type: 'pass', troops: 10000 },
@@ -455,19 +444,19 @@ export const CITIES: CityData[] = [
 
   // 修正：从西伯利亚移回甘肃临洮（唐蕃战争）
 
-  { id: 'city_tanggula', name: '唐古拉山口', factionId: 'panjun', lat: 32.87, lng: 91.92, type: 'pass', troops: 10000 },
+  { id: 'city_tanggula', name: '唐古拉山口', factionId: 'panjun', lat: 32.870000, lng: 91.920000, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_tiemenguan', name: '铁门关', factionId: 'panjun', lat: 41.84, lng: 85.64, type: 'pass', troops: 10000 },
   { id: 'city_tongguan', name: '潼关', factionId: 'panjun', lat: 34.61, lng: 110.28, type: 'pass', troops: 10000, mirror: true },
-  { id: 'city_waqiaoguan', name: '瓦桥关', factionId: 'panjun', lat: 38.98, lng: 116.08, type: 'pass', region: 'NORTH', troops: 10000 },
+  { id: 'city_waqiaoguan', name: '瓦桥关', factionId: 'panjun', lat: 38.980000, lng: 116.080000, type: 'pass', region: 'NORTH', troops: 10000 },
 
   { id: 'city_wuguan', name: '武关', factionId: 'panjun', lat: 33.58, lng: 110.68, type: 'pass', troops: 10000, mirror: true },
-  { id: 'city_wuhai', name: '乌海关', factionId: 'panjun', lat: 35.15, lng: 98.88, type: 'pass', troops: 10000, mirror: true },
+  { id: 'city_wuhai', name: '乌海关', factionId: 'panjun', lat: 35.150000, lng: 98.880000, type: 'pass', troops: 10000 },
   { id: 'city_xianrenguan', name: '仙人关', factionId: 'panjun', lat: 33.63, lng: 106.17, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_xianxiaguan', name: '仙霞关', factionId: 'panjun', lat: 28.39, lng: 118.39, type: 'pass', troops: 10000 },
   { id: 'city_xiaoguan', name: '萧关', factionId: 'panjun', lat: 35.83, lng: 106.27, type: 'pass', region: 'CENTRAL', troops: 10000, mirror: true },
   { id: 'city_xiatasai', name: '细君台', factionId: 'panjun', lat: 42.42, lng: 80.88, type: 'pass', troops: 10000 },
   { id: 'city_yangguan', name: '阳关', factionId: 'panjun', lat: 39.93, lng: 94.06, type: 'pass', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_yangpingguan', name: '阳平关', factionId: 'panjun', lat: 32.97, lng: 106.03, type: 'pass', troops: 10000 },
+  { id: 'city_yangpingguan', name: '阳平关', factionId: 'panjun', lat: 32.970000, lng: 106.030000, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_yangshanguan', name: '阳山关', factionId: 'panjun', lat: 24.31, lng: 112.61, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_yanmenguan', name: '雁门关', factionId: 'panjun', lat: 39.21, lng: 112.88, type: 'pass', troops: 10000, mirror: true },
   { id: 'city_yanranleshi', name: '燕然勒石', factionId: 'panjun', lat: 45.10, lng: 104.33, type: 'pass', region: 'NOMADIC', troops: 10000, mirror: true },
@@ -481,20 +470,20 @@ export const CITIES: CityData[] = [
 
 
   { id: 'city_guandu', name: '官渡', factionId: 'panjun', lat: 34.72, lng: 114.02, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_jundu', name: '军渡', factionId: 'panjun', lat: 37.40, lng: 110.87, type: 'ferry', troops: 10000 },
+  { id: 'city_jundu', name: '军渡', factionId: 'panjun', lat: 37.389978, lng: 110.679016, type: 'ferry', troops: 10000 },
   { id: 'city_longmen', name: '蒲津渡', factionId: 'panjun', lat: 34.85, lng: 110.28, type: 'ferry', troops: 10000 },
   { id: 'city_longmen_sui', name: '龙门', factionId: 'panjun', lat: 35.45, lng: 110.45, type: 'ferry', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_chenjiadao', name: '陈家岛', factionId: 'panjun', lat: 35.93, lng: 120.22, type: 'ferry', region: 'NORTH', troops: 10000 },
-  { id: 'city_liugongdao', name: '刘公岛', factionId: 'panjun', lat: 37.50, lng: 122.18, type: 'ferry', region: 'NORTH', troops: 10000 },
-  { id: 'city_dengzhou', name: '登州', factionId: 'panjun', lat: 37.82, lng: 120.75, type: 'ferry', region: 'NORTH', troops: 10000 },
-  { id: 'city_lushun_baiyushan', name: '旅顺', factionId: 'panjun', lat: 38.82, lng: 121.25, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
-  { id: 'city_cengang', name: '岑港', factionId: 'panjun', lat: 30.05, lng: 122.02, type: 'ferry', region: 'SOUTH', troops: 10000 },
+  { id: 'city_chenjiadao', name: '陈家岛', factionId: 'panjun', lat: 35.930000, lng: 120.220000, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
+  { id: 'city_liugongdao', name: '刘公岛', factionId: 'panjun', lat: 37.500000, lng: 122.180000, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
+  { id: 'city_dengzhou', name: '登州', factionId: 'panjun', lat: 37.820000, lng: 120.750000, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_lushun_baiyushan', name: '旅顺', factionId: 'panjun', lat: 38.820000, lng: 121.250000, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
+  { id: 'city_cengang', name: '岑港', factionId: 'panjun', lat: 30.050000, lng: 122.020000, type: 'ferry', region: 'LINGNAN', troops: 10000 },
   { id: 'city_penghu', name: '澎湖', factionId: 'panjun', lat: 23.57, lng: 119.57, type: 'ferry', region: 'LINGNAN', troops: 10000 },
-  { id: 'city_liaoluowan', name: '料罗湾', factionId: 'panjun', lat: 24.42, lng: 118.43, type: 'ferry', region: 'SOUTH', troops: 10000 },
+  { id: 'city_liaoluowan', name: '料罗湾', factionId: 'panjun', lat: 24.420000, lng: 118.430000, type: 'ferry', region: 'LINGNAN', troops: 10000 },
   { id: 'city_tunmen', name: '屯门', factionId: 'panjun', lat: 22.38, lng: 113.92, type: 'ferry', region: 'LINGNAN', troops: 10000 },
   { id: 'city_yashan', name: '崖山', factionId: 'panjun', lat: 22.20, lng: 113.06, type: 'ferry', region: 'LINGNAN', troops: 10000 },
-  { id: 'city_humen', name: '虎门', factionId: 'panjun', lat: 22.82, lng: 113.63, type: 'ferry', region: 'LINGNAN', troops: 10000 },
-  { id: 'city_baijiangkou', name: '白江口', factionId: 'panjun', lat: 35.98, lng: 126.68, type: 'ferry', troops: 10000, mirror: true },
+  { id: 'city_humen', name: '虎门', factionId: 'panjun', lat: 22.820000, lng: 113.630000, type: 'ferry', region: 'SOUTH', troops: 10000 },
+  { id: 'city_baijiangkou', name: '白江口', factionId: 'panjun', lat: 35.980000, lng: 126.680000, type: 'ferry', troops: 10000, mirror: true },
   { id: 'city_baitengjiang', name: '白藤江', factionId: 'panjun', lat: 20.83, lng: 106.67, type: 'ferry', region: 'LINGNAN', troops: 10000 },
 
 
@@ -502,21 +491,22 @@ export const CITIES: CityData[] = [
   // ==================== 核心军事枢纽 (Huge Cities) ====================
   { id: 'city_yecheng', name: '邺城', factionId: 'panjun', lat: 36.28, lng: 114.43, type: 'huge_city', region: 'NORTH', troops: 10000 }, // 魏晋南北朝军事重心，“邺城兴则中原定”
   { id: 'city_sabi', name: '泗沘', factionId: 'panjun', lat: 36.280000, lng: 126.910000, type: 'large_city', region: 'KOREA', troops: 10000 }, // 白江口之战后的战略重心
-  { id: 'city_osaka_castle', name: '大坂城', factionId: 'panjun', lat: 34.69, lng: 135.52, type: 'huge_city', region: 'JAPAN', troops: 10000 }, // 日本战国终结之地
+  { id: 'city_osaka_castle', name: '大坂城', factionId: 'panjun', lat: 34.690000, lng: 135.520000, type: 'large_city', region: 'JAPAN', troops: 10000, mirror: true }, // 日本战国终结之地
 
 
   // ==================== 区域战役重心 (Large Cities) ====================
   // --- 中原战线 ---
-  { id: 'city_runan', name: '汝南', factionId: 'panjun', lat: 32.94, lng: 114.37, type: 'large_city', region: 'CENTRAL', troops: 10000 }, // 袁氏祖地，中原后勤中心
+  { id: 'city_runan', name: '蔡州', factionId: 'panjun', lat: 32.94, lng: 114.37, type: 'large_city', region: 'CENTRAL', troops: 10000 }, // 袁氏祖地，中原后勤中心
+  { id: 'city_zhuxianzhen', name: '朱仙镇', factionId: 'panjun', lat: 34.58, lng: 114.28, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   // --- 北方走廊 ---
   { id: 'city_suide', name: '绥德', factionId: 'panjun', lat: 37.51, lng: 110.22, type: 'large_city', region: 'NORTHWEST', troops: 10000 }, // 秦汉上郡，蒙恬屯兵处
   { id: 'city_shuozhou_my', name: '马邑', factionId: 'panjun', lat: 39.33, lng: 112.43, type: 'large_city', region: 'NORTH', troops: 10000 }, // 马邑之谋，汉匈战争转折点
-  { id: 'city_guangning', name: '广宁', factionId: 'panjun', lat: 41.59, lng: 121.79, type: 'large_city', region: 'NORTH', troops: 10000 }, // 明代辽东镇核心
+  { id: 'city_guangning', name: '广宁', factionId: 'panjun', lat: 41.590000, lng: 121.790000, type: 'small_city', region: 'NORTH', troops: 10000 }, // 明代辽东镇核心
   { id: 'city_dingzhou', name: '中山', factionId: 'panjun', lat: 38.51, lng: 114.99, type: 'large_city', region: 'NORTH', troops: 10000 }, // 战国中山国，后为北方防御重镇
   { id: 'city_beiting_war', name: '北庭', factionId: 'panjun', lat: 44.02, lng: 89.10, type: 'large_city', region: 'WESTERN', troops: 10000 }, // 唐代北庭都护府
 
   // --- 岭南与国际 ---
-  { id: 'city_hepu', name: '合浦', factionId: 'panjun', lat: 21.66, lng: 109.20, type: 'large_city', region: 'LINGNAN', troops: 10000 }, // 马援南征交趾转运点
+  { id: 'city_hepu', name: '合浦', factionId: 'panjun', lat: 21.660000, lng: 109.200000, type: 'ferry', region: 'LINGNAN', troops: 10000 }, // 马援南征交趾转运点
 
   // ==================== 著名古战场与军事堡垒 (Small Cities) ====================
   { id: 'city_tumubao', name: '土木堡', factionId: 'panjun', lat: 40.35, lng: 115.65, type: 'small_city', region: 'NORTH', troops: 10000 }, // 明代重大转折点
@@ -527,17 +517,17 @@ export const CITIES: CityData[] = [
   { id: 'city_fanchang', name: '繁昌', factionId: 'panjun', lat: 31.08, lng: 118.20, type: 'small_city', region: 'SOUTH', troops: 10000 }, // 长江南岸拦截点
   { id: 'city_barkol_fort', name: '巴里坤', factionId: 'panjun', lat: 43.60, lng: 93.01, type: 'small_city', region: 'WESTERN', troops: 10000 }, // 西域屯田堡垒
   { id: 'city_xishui', name: '戏水', factionId: 'panjun', lat: 34.40, lng: 109.32, type: 'small_city', region: 'CENTRAL', troops: 10000 }, // 戏之战：章邯破周文
-  { id: 'city_weishui', name: '潍水', factionId: 'panjun', lat: 36.38, lng: 119.33, type: 'small_city', region: 'CENTRAL', troops: 10000 }, // 潍水之战：韩信水淹龙且
+  { id: 'city_weishui', name: '潍水', factionId: 'panjun', lat: 36.380000, lng: 119.330000, type: 'ferry', region: 'CENTRAL', troops: 10000 }, // 潍水之战：韩信水淹龙且
 
   // ==================== 东汉/三国/晋 新增关键据点 ====================
   // --- 东汉 ---
   { id: 'city_xiaodi', name: '崤底', factionId: 'panjun', lat: 34.73, lng: 111.75, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_lueyang_ts', name: '略阳', factionId: 'panjun', lat: 34.85, lng: 105.67, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_lueyang_ts', name: '略阳', factionId: 'panjun', lat: 34.850000, lng: 105.670000, type: 'small_city', region: 'CENTRAL', troops: 10000 },
 
-  { id: 'city_chiting', name: '赤亭', factionId: 'panjun', lat: 42.85, lng: 91.13, type: 'small_city', region: 'WESTERN', troops: 10000 },
+  { id: 'city_chiting', name: '赤亭', factionId: 'panjun', lat: 42.850000, lng: 91.130000, type: 'pass', region: 'WESTERN', troops: 10000 },
   { id: 'city_baibo', name: '白波谷', factionId: 'panjun', lat: 35.85, lng: 111.38, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_xianbeishan', name: '鲜卑山', factionId: 'panjun', lat: 49.20, lng: 119.7, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_jinweishan', name: '金微山', factionId: 'panjun', lat: 47.50, lng: 93.50, type: 'small_city', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_xianbeishan', name: '鲜卑山', factionId: 'panjun', lat: 49.20, lng: 119.7, type: 'pass', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_jinweishan', name: '金微山', factionId: 'panjun', lat: 47.50, lng: 93.50, type: 'pass', region: 'NOMADIC', troops: 10000 },
 
   // --- 三国 ---
   { id: 'city_luyang', name: '鲁阳', factionId: 'panjun', lat: 33.73, lng: 112.90, type: 'small_city', region: 'CENTRAL', troops: 10000 },
@@ -545,21 +535,20 @@ export const CITIES: CityData[] = [
   { id: 'city_shouzhang', name: '寿张', factionId: 'panjun', lat: 35.82, lng: 116.12, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_wuchao', name: '乌巢', factionId: 'panjun', lat: 35.08, lng: 114.33, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_nanpi', name: '南皮', factionId: 'panjun', lat: 38.03, lng: 116.70, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_bowangpo', name: '博望坡', factionId: 'panjun', lat: 33.15, lng: 112.87, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_bowangpo', name: '博望坡', factionId: 'panjun', lat: 33.150000, lng: 112.870000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_luocheng', name: '雒城', factionId: 'panjun', lat: 30.98, lng: 104.28, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_dingjunshan', name: '定军山', factionId: 'panjun', lat: 33.05, lng: 106.65, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_xingshishan', name: '兴势山', factionId: 'panjun', lat: 33.30, lng: 107.55, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_dingjunshan', name: '定军山', factionId: 'panjun', lat: 33.050000, lng: 106.650000, type: 'small_city', region: 'NORTHWEST', troops: 10000, mirror: true },
+  { id: 'city_xingshishan', name: '兴势山', factionId: 'panjun', lat: 33.300000, lng: 107.550000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
 
   // --- 两晋/十六国 ---
   { id: 'city_ningpingcheng', name: '宁平', factionId: 'panjun', lat: 33.63, lng: 115.15, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_xiangguo', name: '襄国', factionId: 'panjun', lat: 37.07, lng: 114.50, type: 'large_city', region: 'NORTH', troops: 10000 }, // Huge historical importance
-  { id: 'city_jicheng_ln', name: '棘城', factionId: 'panjun', lat: 41.53, lng: 121.23, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_liantai', name: '廉台', factionId: 'panjun', lat: 38.17, lng: 114.97, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_jicheng_ln', name: '棘城', factionId: 'panjun', lat: 41.530000, lng: 121.230000, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_yewang', name: '野王', factionId: 'panjun', lat: 35.08, lng: 112.93, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_fangtou', name: '枋头', factionId: 'panjun', lat: 35.67, lng: 114.55, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_xingcheng', name: '杏城', factionId: 'panjun', lat: 35.58, lng: 109.27, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_dailaicheng', name: '代来', factionId: 'panjun', lat: 39.10, lng: 107.98, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_taibi', name: '台壁', factionId: 'panjun', lat: 36.50, lng: 113.38, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_dailaicheng', name: '代来', factionId: 'panjun', lat: 39.100000, lng: 107.980000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_taibi', name: '台壁', factionId: 'panjun', lat: 36.500000, lng: 113.380000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
   { id: 'city_canhebei', name: '参合陂', factionId: 'panjun', lat: 40.53, lng: 112.50, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_liaokou', name: '簝口', factionId: 'panjun', lat: 29.80, lng: 103.80, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
 
@@ -568,7 +557,7 @@ export const CITIES: CityData[] = [
   { id: 'city_queao', name: '碻磝', factionId: 'panjun', lat: 36.27, lng: 116.32, type: 'small_city', region: 'NORTH', troops: 10000 },
   { id: 'city_shancheng', name: '陕城', factionId: 'panjun', lat: 34.77, lng: 111.12, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_zhongli', name: '钟离', factionId: 'panjun', lat: 32.92, lng: 117.60, type: 'large_city', region: 'SOUTH', troops: 10000 }, // Battle of Zhongli
-  { id: 'city_hanlingshan', name: '韩陵山', factionId: 'panjun', lat: 36.17, lng: 114.45, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_hanlingshan', name: '韩陵山', factionId: 'panjun', lat: 36.170000, lng: 114.450000, type: 'small_city', region: 'NORTHWEST', troops: 10000, mirror: true },
   { id: 'city_lizhou', name: '利州', factionId: 'panjun', lat: 32.43, lng: 105.83, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_yiyang_hn', name: '宜阳', factionId: 'panjun', lat: 34.52, lng: 112.17, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_woye', name: '沃野镇', factionId: 'panjun', lat: 40.95, lng: 108.60, type: 'small_city', region: 'NOMADIC', troops: 10000 },
@@ -576,26 +565,26 @@ export const CITIES: CityData[] = [
   { id: 'city_wuchuan', name: '武川镇', factionId: 'panjun', lat: 41.10, lng: 111.45, type: 'small_city', region: 'NOMADIC', troops: 10000 },
 
   // --- 隋唐之交 ---
-  { id: 'city_fenglishan', name: '丰利山', factionId: 'panjun', lat: 31.42, lng: 113.68, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_fenglishan', name: '丰利山', factionId: 'panjun', lat: 31.420000, lng: 113.680000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_yunkou', name: '涢口', factionId: 'panjun', lat: 30.64, lng: 113.99, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_baidao', name: '白道', factionId: 'panjun', lat: 40.95, lng: 111.65, type: 'small_city', region: 'NOMADIC', troops: 10000 },
   { id: 'city_shacheng', name: '砂城', factionId: 'panjun', lat: 40.88, lng: 107.15, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_mantoushan', name: '曼头山', factionId: 'panjun', lat: 36.20, lng: 100.60, type: 'small_city', region: 'WESTERN', troops: 10000 },
+  { id: 'city_mantoushan', name: '曼头山', factionId: 'panjun', lat: 36.200000, lng: 100.600000, type: 'small_city', region: 'TIBET', troops: 10000, mirror: true },
   { id: 'city_langweitan', name: '狼尾滩', factionId: 'panjun', lat: 31.03, lng: 110.15, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_qingshan_nm', name: '青山', factionId: 'panjun', lat: 42.27, lng: 118.95, type: 'small_city', region: 'NOMADIC', troops: 10000 },
+  { id: 'city_qingshan_nm', name: '青山', factionId: 'panjun', lat: 42.270000, lng: 118.950000, type: 'pass', region: 'NOMADIC', troops: 10000 },
 
   { id: 'city_gaojibo', name: '高鸡泊', factionId: 'panjun', lat: 37.15, lng: 115.88, type: 'small_city', region: 'NORTH', troops: 10000 }, // Dou Jiande
   { id: 'city_fufeng_tang', name: '扶风', factionId: 'panjun', lat: 34.30, lng: 108.48, type: 'small_city', region: 'CENTRAL', troops: 10000 },
 
-  { id: 'city_zhua', name: '祝阿', factionId: 'panjun', lat: 36.78, lng: 116.75, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_zhua', name: '祝阿', factionId: 'panjun', lat: 36.780000, lng: 116.750000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true },
 
   // --- 唐朝/安史之乱/晚唐 ---
   { id: 'city_huoyi', name: '霍邑', factionId: 'panjun', lat: 36.57, lng: 111.72, type: 'small_city', region: 'CENTRAL', troops: 10000 }, // Li Yuan
   { id: 'city_qianshuiyuan', name: '浅水原', factionId: 'panjun', lat: 35.25, lng: 107.82, type: 'small_city', region: 'NORTHWEST', troops: 10000 }, // Li Shimin
-  { id: 'city_baibi', name: '柏壁', factionId: 'panjun', lat: 35.58, lng: 111.12, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_mingshui', name: '洺水', factionId: 'panjun', lat: 36.48, lng: 114.95, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_baibi', name: '柏壁', factionId: 'panjun', lat: 35.580000, lng: 111.120000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_mingshui', name: '洺水', factionId: 'panjun', lat: 36.480000, lng: 114.950000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_minzhou', name: '岷州', factionId: 'panjun', lat: 34.43, lng: 104.03, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_dafeichuan', name: '大非川', factionId: 'panjun', lat: 35.389632, lng: 100.090942, type: 'small_city', region: 'WESTERN', troops: 10000 },
+  { id: 'city_dafeichuan', name: '大非川', factionId: 'panjun', lat: 35.389632, lng: 100.090942, type: 'ferry', region: 'TIBET', troops: 10000 },
   { id: 'city_xiangjisi', name: '香积寺', factionId: 'panjun', lat: 34.12, lng: 108.88, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_mozhou', name: '莫州', factionId: 'panjun', lat: 38.70, lng: 116.12, type: 'small_city', region: 'NORTH', troops: 10000 },
   { id: 'city_fengtian', name: '奉天', factionId: 'panjun', lat: 34.53, lng: 108.23, type: 'small_city', region: 'CENTRAL', troops: 10000 },
@@ -614,7 +603,7 @@ export const CITIES: CityData[] = [
   { id: 'city_qigouguan', name: '歧沟关', factionId: 'panjun', lat: 39.35, lng: 115.82, type: 'pass', region: 'NORTH', troops: 10000 },
   { id: 'city_haoshuichuan', name: '好水川', factionId: 'panjun', lat: 35.62, lng: 106.12, type: 'small_city', region: 'NORTHWEST', troops: 10000 }, // Song-Xia War
   { id: 'city_dingchuanzhai', name: '定川寨', factionId: 'panjun', lat: 36.12, lng: 106.28, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
-  { id: 'city_duanwudao', name: '断坞道', factionId: 'panjun', lat: 29.82, lng: 118.88, type: 'small_city', region: 'SOUTH', troops: 10000 }, // Fang La Rebellion
+  { id: 'city_duanwudao', name: '断坞道', factionId: 'panjun', lat: 29.820000, lng: 118.880000, type: 'ferry', region: 'SOUTH', troops: 10000, mirror: true }, // Fang La Rebellion
   { id: 'city_yonglecheng', name: '永乐城', factionId: 'panjun', lat: 37.95, lng: 109.88, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
 
   // --- 辽金/南宋初 ---
@@ -622,15 +611,15 @@ export const CITIES: CityData[] = [
   { id: 'city_gushidong', name: '固石洞', factionId: 'panjun', lat: 26.12, lng: 115.38, type: 'small_city', region: 'SOUTH', troops: 10000 },
 
   // --- 南宋/宋金战争 ---
-  { id: 'city_wumashan', name: '五马山', factionId: 'panjun', lat: 37.60, lng: 114.22, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_huangtiandang', name: '黄天荡', factionId: 'panjun', lat: 32.18, lng: 119.05, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_wumashan', name: '五马山', factionId: 'panjun', lat: 37.600000, lng: 114.220000, type: 'small_city', region: 'NORTHWEST', troops: 10000, mirror: true },
+  { id: 'city_huangtiandang', name: '黄天荡', factionId: 'panjun', lat: 32.18, lng: 119.10, type: 'small_city', region: 'SOUTH', troops: 10000, mirror: true },
   { id: 'city_fuping', name: '富平', factionId: 'panjun', lat: 34.75, lng: 109.18, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_dayi', name: '大仪镇', factionId: 'panjun', lat: 32.48, lng: 119.18, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_dayi', name: '大仪镇', factionId: 'panjun', lat: 32.48, lng: 119.12, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_yancheng_battle', name: '郾城', factionId: 'panjun', lat: 33.58, lng: 114.02, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_zhegao', name: '柘皋', factionId: 'panjun', lat: 31.73, lng: 117.80, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_jiezhou', name: '解州', factionId: 'panjun', lat: 34.92, lng: 110.70, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_zaoyang', name: '枣阳', factionId: 'panjun', lat: 32.13, lng: 112.75, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_huangzhou_hb', name: '黄州', factionId: 'panjun', lat: 30.45, lng: 114.88, type: 'small_city', region: 'SOUTH', troops: 10000 },
+  { id: 'city_huangzhou_hb', name: '黄州', factionId: 'panjun', lat: 30.450000, lng: 114.880000, type: 'small_city', region: 'SOUTH', troops: 10000, mirror: true },
   { id: 'city_deshunjun', name: '德顺军', factionId: 'panjun', lat: 35.52, lng: 105.73, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
 
   // ==================== 战略孤立名关 (Pass) ====================
@@ -650,10 +639,10 @@ export const CITIES: CityData[] = [
   { id: 'city_jingkou', name: '京口', factionId: 'panjun', lat: 32.22, lng: 119.46, type: 'ferry', region: 'SOUTH', troops: 10000 }, // 刘裕北伐基地，长江防线枢纽
   { id: 'city_sanhe_du', name: '三河', factionId: 'panjun', lat: 31.52, lng: 117.25, type: 'ferry', region: 'SOUTH', troops: 10000 }, // 巢湖决战点
   { id: 'city_wusongkou', name: '吴淞口', factionId: 'panjun', lat: 31.39, lng: 121.50, type: 'ferry', region: 'SOUTH', troops: 10000 }, // 海防与江防交汇
-  { id: 'city_sinuiju_war', name: '义州渡', factionId: 'panjun', lat: 40.11, lng: 124.39, type: 'ferry', region: 'KOREA', troops: 10000, mirror: true }, // 渡鸭绿江第一节点
+  { id: 'city_sinuiju_war', name: '义州渡', factionId: 'panjun', lat: 40.110000, lng: 124.390000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true }, // 渡鸭绿江第一节点
   { id: 'city_shenyang_sj', name: '盛京', factionId: 'panjun', lat: 41.80, lng: 123.43, type: 'huge_city', region: 'NORTHEAST', troops: 10000 },
   { id: 'city_gangneung', name: '江陵', factionId: 'panjun', lat: 37.75, lng: 128.87, type: 'small_city', region: 'KOREA', troops: 10000 },
-  { id: 'city_ulsan', name: '蔚山', factionId: 'panjun', lat: 35.530000, lng: 129.310000, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_ulsan', name: '蔚山', factionId: 'panjun', lat: 35.530000, lng: 129.310000, type: 'small_city', region: 'KOREA', troops: 10000 },
 
   // ==================== 战略空白填补 (Strategic Gaps) ====================
   { id: 'city_yongmingcheng', name: '永明城', factionId: 'panjun', lat: 43.11, lng: 131.88, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
@@ -668,43 +657,43 @@ export const CITIES: CityData[] = [
 
   // 修正：移动到印度河Attock渡口（札兰丁跳河处）
   { id: 'city_shenhe_indus', name: '申河', factionId: 'panjun', lat: 33.90, lng: 72.35, type: 'small_city', region: 'WEST', troops: 10000 },
-  { id: 'city_sanfengshan', name: '三峰山', factionId: 'panjun', lat: 34.15, lng: 113.35, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_dayazhai', name: '大垭寨', factionId: 'panjun', lat: 31.35, lng: 106.05, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_sanfengshan', name: '三峰山', factionId: 'panjun', lat: 34.150000, lng: 113.350000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_dayazhai', name: '大垭寨', factionId: 'panjun', lat: 31.350000, lng: 106.050000, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_saiyuehe', name: '赛约河', factionId: 'panjun', lat: 47.97, lng: 21.02, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_yunding', name: '云顶城', factionId: 'panjun', lat: 30.70, lng: 104.53, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
-  { id: 'city_shenbicheng', name: '神臂城', factionId: 'panjun', lat: 28.78, lng: 105.15, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_shenbicheng', name: '神臂城', factionId: 'panjun', lat: 28.780000, lng: 105.150000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
 
   // --- 元/明/明末 ---
-  { id: 'city_hakatabay', name: '博多湾', factionId: 'panjun', lat: 33.60, lng: 130.35, type: 'ferry', region: 'JAPAN', troops: 10000 },
+  { id: 'city_hakatabay', name: '博多湾', factionId: 'panjun', lat: 33.600000, lng: 130.350000, type: 'ferry', region: 'JAPAN', troops: 10000 },
   { id: 'city_sardulu', name: '撒儿都鲁', factionId: 'panjun', lat: 48.00, lng: 122.75, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_yedun', name: '也顿村', factionId: 'panjun', lat: 39.95, lng: 124.35, type: 'small_city', region: 'KOREA', troops: 10000 },
+  { id: 'city_yedun', name: '也顿村', factionId: 'panjun', lat: 39.950000, lng: 124.350000, type: 'small_city', region: 'NORTH', troops: 10000 },
 
-  { id: 'city_baigouhe', name: '白沟河', factionId: 'panjun', lat: 39.12, lng: 116.03, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_baigouhe', name: '白沟河', factionId: 'panjun', lat: 39.120000, lng: 116.030000, type: 'ferry', region: 'NORTH', troops: 10000 },
   { id: 'city_duobang', name: '多邦城', factionId: 'panjun', lat: 21.22, lng: 105.45, type: 'small_city', region: 'LINGNAN', troops: 10000 },
   { id: 'city_colombo', name: '科伦坡', factionId: 'panjun', lat: 6.03, lng: 80.22, type: 'small_city', region: 'WEST', troops: 10000 },
   { id: 'city_luchuan', name: '麓川', factionId: 'panjun', lat: 24.33, lng: 97.97, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
   { id: 'city_anqing', name: '安庆', factionId: 'panjun', lat: 30.52, lng: 117.05, type: 'small_city', region: 'SOUTH', troops: 10000 },
   { id: 'city_bitiguan', name: '碧蹄馆', factionId: 'panjun', lat: 37.68, lng: 126.90, type: 'small_city', region: 'KOREA', troops: 10000 },
-  { id: 'city_manaoshan', name: '玛瑙山', factionId: 'panjun', lat: 31.95, lng: 112.45, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_manaoshan', name: '玛瑙山', factionId: 'panjun', lat: 31.950000, lng: 112.450000, type: 'large_city', region: 'CHU_SHU', troops: 10000 },
 
   // --- 明清鼎革 ---
-  { id: 'city_fushun', name: '抚顺', factionId: 'panjun', lat: 41.88, lng: 123.95, type: 'small_city', region: 'NORTHEAST', troops: 10000 },
+  { id: 'city_fushun', name: '抚顺', factionId: 'panjun', lat: 41.880000, lng: 123.950000, type: 'small_city', region: 'NORTHEAST', troops: 10000, mirror: true },
   { id: 'city_zunhua', name: '遵化', factionId: 'panjun', lat: 40.18, lng: 117.97, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_jiangkou_sichuan', name: '江口', factionId: 'panjun', lat: 30.22, lng: 103.87, type: 'small_city', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_jiangkou_sichuan', name: '江口', factionId: 'panjun', lat: 30.220000, lng: 103.870000, type: 'ferry', region: 'CHU_SHU', troops: 10000, mirror: true },
   { id: 'city_siming', name: '思明州', factionId: 'panjun', lat: 24.48, lng: 118.10, type: 'small_city', region: 'LINGNAN', troops: 10000 },
 
   { id: 'city_hetongpo', name: '和通泊', factionId: 'panjun', lat: 48.65, lng: 88.90, type: 'small_city', region: 'NOMADIC', troops: 10000 },
-  { id: 'city_laoguantun', name: '老官屯', factionId: 'panjun', lat: 24.22, lng: 97.00, type: 'small_city', region: 'LINGNAN', troops: 10000 },
-  { id: 'city_baliqiao', name: '八里桥', factionId: 'panjun', lat: 39.92, lng: 116.62, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_daludao', name: '大鹿岛', factionId: 'panjun', lat: 39.50, lng: 123.50, type: 'ferry', region: 'NORTH', troops: 10000 },
+  { id: 'city_laoguantun', name: '老官屯', factionId: 'panjun', lat: 24.220000, lng: 97.000000, type: 'ferry', region: 'CHU_SHU', troops: 10000 },
+  { id: 'city_baliqiao', name: '八里桥', factionId: 'panjun', lat: 39.920000, lng: 116.700000, type: 'ferry', region: 'NORTH', troops: 10000, mirror: true },
+  { id: 'city_daludao', name: '大鹿岛', factionId: 'panjun', lat: 39.500000, lng: 123.500000, type: 'ferry', region: 'NORTHEAST', troops: 10000 },
 
   // --- 战国时期 ---
   { id: 'city_guiling', name: '桂陵', factionId: 'panjun', lat: 35.20, lng: 114.67, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_maling', name: '马陵', factionId: 'panjun', lat: 35.85, lng: 115.50, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_zhuoze', name: '浊泽', factionId: 'panjun', lat: 35.03, lng: 111.00, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_huaibei', name: '浍北', factionId: 'panjun', lat: 35.73, lng: 111.72, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_sangqiu', name: '桑丘', factionId: 'panjun', lat: 34.82, lng: 114.82, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_guanze', name: '观泽', factionId: 'panjun', lat: 37.03, lng: 115.67, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_sangqiu', name: '桑丘', factionId: 'panjun', lat: 34.820000, lng: 114.820000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
+  { id: 'city_guanze', name: '观泽', factionId: 'panjun', lat: 37.030000, lng: 115.670000, type: 'small_city', region: 'NORTH', troops: 10000, mirror: true },
   { id: 'city_chuisha', name: '垂沙', factionId: 'panjun', lat: 32.69, lng: 112.83, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_yique', name: '伊阙', factionId: 'panjun', lat: 34.55, lng: 112.47, type: 'small_city', region: 'CENTRAL', troops: 10000 },
   { id: 'city_jimo', name: '即墨', factionId: 'panjun', lat: 36.27, lng: 120.12, type: 'small_city', region: 'NORTH', troops: 10000 },
@@ -714,7 +703,8 @@ export const CITIES: CityData[] = [
 
   // --- 隋唐 ---
   { id: 'city_xiabo', name: '下博', factionId: 'panjun', lat: 38.00, lng: 115.55, type: 'small_city', region: 'NORTH', troops: 10000 },
-  { id: 'city_ningling', name: '宁陵', factionId: 'panjun', lat: 34.45, lng: 115.32, type: 'small_city', region: 'CENTRAL', troops: 10000 },
-  { id: 'city_hutuo', name: '滹沱', factionId: 'panjun', lat: 38.08, lng: 114.85, type: 'small_city', region: 'NORTH', troops: 10000 },
+  { id: 'city_ningling', name: '宁陵', factionId: 'panjun', lat: 34.45, lng: 115.30, type: 'small_city', region: 'CENTRAL', troops: 10000 },
+  { id: 'city_hutuo', name: '滹沱', factionId: 'panjun', lat: 38.080000, lng: 114.850000, type: 'ferry', region: 'NORTH', troops: 10000 },
+  { id: 'city_sanchuankou', name: '三川口', factionId: 'panjun', lat: 36.720000, lng: 109.230000, type: 'small_city', region: 'NORTHWEST', troops: 10000 },
 
 ];
